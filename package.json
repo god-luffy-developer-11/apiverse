@@ -1,0 +1,23 @@
+{
+  "name": "apiverse-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "APIVerse - The Developer Operating System for Working with APIs",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^1.13.0",
+    "typescript": "^5.4.5",
+    "prettier": "^3.2.5"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

@@ -1,0 +1,196 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-void: #000000;
+  --space-obsidian: #050508;
+  --ruby-crimson: #ffffff;
+  --blood-red: #ffffff;
+  --stark-white: #ffffff;
+  --titanium-silver: #f1f5f9;
+  --ruby-caustic: rgba(255, 255, 255, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Deep Monochromatic Cosmic Void - Pure Black & White Starlight */
+html, body {
+  background-color: #000000;
+  background-image: 
+    radial-gradient(1px 1px at 30px 40px, #ffffff 100%, transparent),
+    radial-gradient(1.5px 1.5px at 150px 90px, #ffffff 100%, transparent),
+    radial-gradient(1px 1px at 280px 220px, #e2e8f0 100%, transparent),
+    radial-gradient(1px 1px at 360px 450px, #f8fafc 100%, transparent),
+    radial-gradient(1.8px 1.8px at 500px 300px, #ffffff 100%, transparent),
+    radial-gradient(1px 1px at 680px 180px, #ffffff 100%, transparent);
+  background-size: 600px 600px, 480px 480px, 650px 650px, 750px 750px, 850px 850px, 700px 700px;
+  background-attachment: fixed;
+  color: #ffffff;
+  overflow-x: hidden;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mineralistic Liquid Glass Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+/* Mineralistic Liquid Glass Panels: Pure Black, Transparent & Stark White */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 14px 40px -8px rgba(0, 0, 0, 0.9),
+    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.75),
+    inset 0 -1.5px 0 0 rgba(0, 0, 0, 0.85);
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 18px 48px -6px rgba(0, 0, 0, 0.95),
+    0 8px 24px rgba(0, 0, 0, 0.95),
+    inset 0 2px 0 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Monochromatic Specular Glow Variant */
+.glass-panel-glow-crimson {
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 0 35px rgba(255, 255, 255, 0.15),
+    0 12px 36px -6px rgba(0, 0, 0, 0.9),
+    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.85);
+}
+
+/* Pure White Specular Glow Variant */
+.glass-panel-glow-white {
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 
+    0 0 30px rgba(255, 255, 255, 0.25),
+    0 12px 36px -6px rgba(0, 0, 0, 0.9),
+    inset 0 2px 0 0 rgba(255, 255, 255, 0.95);
+}
+
+/* Deep Obsidian Dark Void Variant */
+.glass-panel-glow-obsidian {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.95),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Aerospace HUD corner brackets in Stark White */
+.hud-frame {
+  position: relative;
+}
+.hud-frame::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 7px;
+  height: 7px;
+  border-top: 1.5px solid #ffffff;
+  border-left: 1.5px solid #ffffff;
+  pointer-events: none;
+}
+.hud-frame::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 7px;
+  height: 7px;
+  border-bottom: 1.5px solid #ffffff;
+  border-right: 1.5px solid #ffffff;
+  pointer-events: none;
+}
+
+/* Animations: Liquid Shimmer Gleam */
+@keyframes liquid-shimmer {
+  0% { transform: translateX(-100%) rotate(25deg); }
+  100% { transform: translateX(200%) rotate(25deg); }
+}
+
+.animate-liquid-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: liquid-shimmer 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+/* Breathing Singularity Heartbeat */
+@keyframes singularity-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3), inset 0 0 15px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 0 45px rgba(255, 26, 64, 0.8), inset 0 0 25px rgba(255, 255, 255, 0.3);
+  }
+}
+
+.animate-singularity-pulse {
+  animation: singularity-pulse 3.5s ease-in-out infinite;
+}
+
+/* Cosmic Particle Twinkle */
+@keyframes cosmic-twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.animate-cosmic-twinkle {
+  animation: cosmic-twinkle 2.5s ease-in-out infinite;
+}
+
+/* Typography Gradient Utilities: Pure White & Crimson Blood */
+.white-titanium-text {
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 60%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.crimson-ruby-text {
+  background: linear-gradient(135deg, #ffffff 0%, #ff3355 50%, #ff1a40 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.black-hole-void-text {
+  background: linear-gradient(135deg, #ffffff 0%, #ff1a40 40%, #000000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

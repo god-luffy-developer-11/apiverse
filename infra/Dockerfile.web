@@ -1,0 +1,14 @@
+FROM node:18-alpine AS runner
+
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+
+COPY package.json pnpm-workspace.yaml turbo.json ./
+COPY packages ./packages
+COPY apps/web ./apps/web
+
+RUN pnpm install --frozen-lockfile=false
+RUN pnpm --filter apiverse-web build
+
+EXPOSE 3000
+CMD ["pnpm", "--filter", "apiverse-web", "start"]
