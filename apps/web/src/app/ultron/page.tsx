@@ -47,7 +47,7 @@ export default function UltronPage() {
   const [tokensCount, setTokensCount] = useState(48);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Voice Engine (Voice Command + Voice Reply like JARVIS)
+  // Voice Engine (Voice Command + Voice Reply like JARVIS Female AI)
   const {
     isListening,
     isSpeaking,
@@ -55,6 +55,7 @@ export default function UltronPage() {
     transcript,
     interimTranscript,
     audioLevel,
+    voiceError,
     startListening,
     stopListening,
     speak,
@@ -198,10 +199,10 @@ export default function UltronPage() {
                 ? 'bg-cyan-500/15 border-cyan-400 text-cyan-200 shadow-[0_0_14px_rgba(6,182,212,0.3)]'
                 : 'bg-white/[0.06] border-white/20 text-zinc-400 hover:text-white'
             }`}
-            title={voiceEnabled ? 'JARVIS Voice Enabled (Click to Mute)' : 'JARVIS Voice Muted (Click to Enable)'}
+            title={voiceEnabled ? 'Female AI Voice Enabled (Click to Mute)' : 'Female AI Voice Muted (Click to Enable)'}
           >
             {voiceEnabled ? <Volume2 className="w-4 h-4 text-cyan-400" /> : <VolumeX className="w-4 h-4" />}
-            <span className="hidden md:inline">{voiceEnabled ? 'Voice Reply: ON' : 'Voice Reply: OFF'}</span>
+            <span className="hidden md:inline">{voiceEnabled ? 'Female Voice: ON' : 'Voice Reply: OFF'}</span>
           </button>
 
           <Badge variant={isSpeaking ? 'healthy' : isListening ? 'neutral' : 'crimson'} pulse>
@@ -320,6 +321,19 @@ export default function UltronPage() {
             </button>
           </div>
         </div>
+
+        {/* Voice Error Banner */}
+        {voiceError && (
+          <div className="p-3 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-200 text-xs font-mono flex items-center justify-between gap-3 animate-pulse">
+            <span>⚠️ {voiceError}</span>
+            <button
+              onClick={() => startListening()}
+              className="px-3 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-100 text-[11px] font-bold border border-amber-500/30 transition-all shrink-0"
+            >
+              Retry Mic
+            </button>
+          </div>
+        )}
 
         {/* Voice & Text Input Command Bar */}
         <div className="flex items-center gap-2">

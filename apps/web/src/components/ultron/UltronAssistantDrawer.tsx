@@ -30,12 +30,13 @@ export const UltronAssistantDrawer: React.FC = () => {
   ]);
   const [isStreaming, setIsStreaming] = useState(false);
 
-  // JARVIS Voice Engine
+  // Female AI Voice Engine
   const {
     isListening,
     isSpeaking,
     voiceEnabled,
     interimTranscript,
+    voiceError,
     startListening,
     stopListening,
     speak,
