@@ -1,0 +1,271 @@
+{
+  "total_apis": 2193,
+  "total_categories": 53,
+  "categories": [
+    {
+      "name": "APIs Covered Under APILayer Suite!",
+      "icon": "✨",
+      "count": 11
+    },
+    {
+      "name": "Animals",
+      "icon": "🐾",
+      "count": 24
+    },
+    {
+      "name": "Anime",
+      "icon": "⛩️",
+      "count": 20
+    },
+    {
+      "name": "Anti-Malware",
+      "icon": "🛡️",
+      "count": 17
+    },
+    {
+      "name": "Art & Design",
+      "icon": "🎨",
+      "count": 31
+    },
+    {
+      "name": "Authentication & Authorization",
+      "icon": "✨",
+      "count": 7
+    },
+    {
+      "name": "Blockchain",
+      "icon": "⛓️",
+      "count": 17
+    },
+    {
+      "name": "Books",
+      "icon": "📚",
+      "count": 26
+    },
+    {
+      "name": "Business",
+      "icon": "💼",
+      "count": 43
+    },
+    {
+      "name": "Calendar",
+      "icon": "📅",
+      "count": 22
+    },
+    {
+      "name": "Cloud Storage & File Sharing",
+      "icon": "☁️",
+      "count": 19
+    },
+    {
+      "name": "Continuous Integration",
+      "icon": "🔄",
+      "count": 6
+    },
+    {
+      "name": "Cryptocurrency",
+      "icon": "🪙",
+      "count": 95
+    },
+    {
+      "name": "Currency Exchange",
+      "icon": "💱",
+      "count": 27
+    },
+    {
+      "name": "Data Validation",
+      "icon": "✅",
+      "count": 16
+    },
+    {
+      "name": "Development",
+      "icon": "💻",
+      "count": 216
+    },
+    {
+      "name": "Dictionaries",
+      "icon": "📖",
+      "count": 15
+    },
+    {
+      "name": "Documents & Productivity",
+      "icon": "📝",
+      "count": 53
+    },
+    {
+      "name": "Email",
+      "icon": "✉️",
+      "count": 37
+    },
+    {
+      "name": "Entertainment",
+      "icon": "🍿",
+      "count": 19
+    },
+    {
+      "name": "Environment",
+      "icon": "🌱",
+      "count": 30
+    },
+    {
+      "name": "Events",
+      "icon": "🎟️",
+      "count": 4
+    },
+    {
+      "name": "Finance",
+      "icon": "💰",
+      "count": 96
+    },
+    {
+      "name": "Food & Drink",
+      "icon": "🍔",
+      "count": 35
+    },
+    {
+      "name": "Games & Comics",
+      "icon": "🎮",
+      "count": 109
+    },
+    {
+      "name": "Geocoding",
+      "icon": "🗺️",
+      "count": 111
+    },
+    {
+      "name": "Government",
+      "icon": "🏛️",
+      "count": 126
+    },
+    {
+      "name": "Health",
+      "icon": "🏥",
+      "count": 47
+    },
+    {
+      "name": "Jobs",
+      "icon": "💼",
+      "count": 36
+    },
+    {
+      "name": "MCP Servers",
+      "icon": "🤖",
+      "count": 21
+    },
+    {
+      "name": "Machine Learning",
+      "icon": "🧠",
+      "count": 54
+    },
+    {
+      "name": "Music",
+      "icon": "🎵",
+      "count": 35
+    },
+    {
+      "name": "News",
+      "icon": "📰",
+      "count": 26
+    },
+    {
+      "name": "Open Data",
+      "icon": "🌐",
+      "count": 77
+    },
+    {
+      "name": "Open Source Projects",
+      "icon": "🐙",
+      "count": 11
+    },
+    {
+      "name": "Patent",
+      "icon": "📜",
+      "count": 4
+    },
+    {
+      "name": "Personality",
+      "icon": "👤",
+      "count": 27
+    },
+    {
+      "name": "Phone",
+      "icon": "📱",
+      "count": 8
+    },
+    {
+      "name": "Photography",
+      "icon": "📷",
+      "count": 37
+    },
+    {
+      "name": "Programming",
+      "icon": "⌨️",
+      "count": 5
+    },
+    {
+      "name": "Science & Math",
+      "icon": "🔬",
+      "count": 59
+    },
+    {
+      "name": "Security",
+      "icon": "🔒",
+      "count": 60
+    },
+    {
+      "name": "Shopping",
+      "icon": "🛍️",
+      "count": 28
+    },
+    {
+      "name": "Social",
+      "icon": "💬",
+      "count": 58
+    },
+    {
+      "name": "Sports & Fitness",
+      "icon": "⚽",
+      "count": 66
+    },
+    {
+      "name": "Test Data",
+      "icon": "🧪",
+      "count": 37
+    },
+    {
+      "name": "Text Analysis",
+      "icon": "📊",
+      "count": 20
+    },
+    {
+      "name": "Tracking",
+      "icon": "📦",
+      "count": 11
+    },
+    {
+      "name": "Transportation",
+      "icon": "🚆",
+      "count": 94
+    },
+    {
+      "name": "URL Shorteners",
+      "icon": "🔗",
+      "count": 21
+    },
+    {
+      "name": "Vehicle",
+      "icon": "🚗",
+      "count": 15
+    },
+    {
+      "name": "Video",
+      "icon": "🎥",
+      "count": 58
+    },
+    {
+      "name": "Weather",
+      "icon": "⛅",
+      "count": 46
+    }
+  ]
+}

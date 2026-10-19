@@ -21,7 +21,12 @@ import {
   KeyRound,
   PlaySquare,
   BookOpen,
-  ArrowUpRight
+  ArrowUpRight,
+  Lock,
+  Globe2,
+  ChevronLeft,
+  ChevronRight,
+  Database
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -32,6 +37,7 @@ interface ApiItem {
   constellation: string;
   description: string;
   authType: string;
+  authRaw?: string;
   pricing: string;
   latencyMs: number;
   uptime99: number;
@@ -42,321 +48,74 @@ interface ApiItem {
   apiKeyUrl?: string;
   docsUrl?: string;
   portalUrl?: string;
+  url?: string;
+  https?: boolean;
+  cors?: string;
   quickSetupSnippet?: string;
 }
 
-const DEFAULT_APIS: ApiItem[] = [
-  {
-    id: "stripe",
-    name: "Stripe Payments",
-    category: "Fintech & Billing",
-    constellation: "Cygnus",
-    description: "Financial infrastructure for the internet. Payments, billing, subscriptions, invoicing and identity verification.",
-    authType: "API_KEY",
-    pricing: "FREEMIUM",
-    latencyMs: 85,
-    uptime99: 99.99,
-    freeTierLimit: "Sandbox unlimited, 2.9% + $0.30 per live charge",
-    icon: "💳",
-    endpointsCount: 182,
-    popularityRank: 98,
-    apiKeyUrl: "https://dashboard.stripe.com/apikeys",
-    docsUrl: "https://stripe.com/docs/api",
-    portalUrl: "https://dashboard.stripe.com"
-  },
-  {
-    id: "openai",
-    name: "OpenAI Platform",
-    category: "AI & Machine Learning",
-    constellation: "Orion",
-    description: "State-of-the-art LLMs (GPT-4o, GPT-4o-mini, text embeddings, DALL-E, Whisper speech-to-text).",
-    authType: "BEARER",
-    pricing: "PAID",
-    latencyMs: 240,
-    uptime99: 99.85,
-    freeTierLimit: "$5 initial grant for new accounts",
-    icon: "🧠",
-    endpointsCount: 45,
-    popularityRank: 99,
-    apiKeyUrl: "https://platform.openai.com/api-keys",
-    docsUrl: "https://platform.openai.com/docs",
-    portalUrl: "https://platform.openai.com"
-  },
-  {
-    id: "gemini",
-    name: "Google Gemini (AI Studio)",
-    category: "AI & Machine Learning",
-    constellation: "Centaurus",
-    description: "Google's multimodal flagship AI models (Gemini 2.5/3.8 Flash, Pro, Vision, Audio, Computer Use) with generous free tier.",
-    authType: "API_KEY",
-    pricing: "FREEMIUM",
-    latencyMs: 140,
-    uptime99: 99.94,
-    freeTierLimit: "15 RPM / 1,500 RPD free with no credit card required",
-    icon: "✨",
-    endpointsCount: 38,
-    popularityRank: 99,
-    apiKeyUrl: "https://aistudio.google.com/app/apikey",
-    docsUrl: "https://ai.google.dev/gemini-api/docs",
-    portalUrl: "https://aistudio.google.com"
-  },
-  {
-    id: "anthropic",
-    name: "Anthropic Claude",
-    category: "AI & Machine Learning",
-    constellation: "Andromeda",
-    description: "Next-generation intelligence with Claude 3.5 Sonnet & Haiku. Premier reasoning, coding, and large context windows.",
-    authType: "API_KEY",
-    pricing: "PAID",
-    latencyMs: 210,
-    uptime99: 99.88,
-    freeTierLimit: "$5 initial credit on organization activation",
-    icon: "🎭",
-    endpointsCount: 26,
-    popularityRank: 97,
-    apiKeyUrl: "https://console.anthropic.com/settings/keys",
-    docsUrl: "https://docs.anthropic.com",
-    portalUrl: "https://console.anthropic.com"
-  },
-  {
-    id: "twilio",
-    name: "Twilio Communications",
-    category: "Messaging & Voice",
-    constellation: "Pegasus",
-    description: "Global communications cloud: programmable SMS, voice, WhatsApp, Two-Factor Verify, and SIP trunking.",
-    authType: "BASIC",
-    pricing: "FREEMIUM",
-    latencyMs: 110,
-    uptime99: 99.95,
-    freeTierLimit: "$15 free sandbox trial balance",
-    icon: "📱",
-    endpointsCount: 94,
-    popularityRank: 92,
-    apiKeyUrl: "https://console.twilio.com/",
-    docsUrl: "https://www.twilio.com/docs",
-    portalUrl: "https://console.twilio.com"
-  },
-  {
-    id: "github",
-    name: "GitHub REST & GraphQL",
-    category: "Developer Tools",
-    constellation: "Cassiopeia",
-    description: "Automate repositories, issues, PRs, actions, git trees, security advisories, and webhooks.",
-    authType: "BEARER",
-    pricing: "OPEN_SOURCE",
-    latencyMs: 62,
-    uptime99: 99.92,
-    freeTierLimit: "5,000 req/hr authenticated free across all personal accounts",
-    icon: "🐙",
-    endpointsCount: 320,
-    popularityRank: 97,
-    apiKeyUrl: "https://github.com/settings/tokens",
-    docsUrl: "https://docs.github.com/en/rest",
-    portalUrl: "https://github.com/settings/developers"
-  },
-  {
-    id: "supabase",
-    name: "Supabase Platform",
-    category: "Databases & Storage",
-    constellation: "Lyra",
-    description: "The open-source Firebase alternative: Postgres DB, pgvector, row-level security, Auth, Realtime, and Edge Functions.",
-    authType: "API_KEY",
-    pricing: "FREEMIUM",
-    latencyMs: 48,
-    uptime99: 99.97,
-    freeTierLimit: "2 free active projects, 500MB DB, 50,000 monthly active users",
-    icon: "⚡",
-    endpointsCount: 78,
-    popularityRank: 95,
-    apiKeyUrl: "https://supabase.com/dashboard/project/_/settings/api",
-    docsUrl: "https://supabase.com/docs",
-    portalUrl: "https://supabase.com/dashboard"
-  },
-  {
-    id: "resend",
-    name: "Resend Email",
-    category: "Messaging & Voice",
-    constellation: "Pegasus",
-    description: "Modern developer-first transactional email API with React Email components, domain verification, and high deliverability.",
-    authType: "BEARER",
-    pricing: "FREEMIUM",
-    latencyMs: 55,
-    uptime99: 99.99,
-    freeTierLimit: "3,000 emails / month free with custom domain",
-    icon: "✉️",
-    endpointsCount: 24,
-    popularityRank: 94,
-    apiKeyUrl: "https://resend.com/api-keys",
-    docsUrl: "https://resend.com/docs",
-    portalUrl: "https://resend.com"
-  },
-  {
-    id: "groq",
-    name: "Groq LPU Inference",
-    category: "AI & Machine Learning",
-    constellation: "Aquila",
-    description: "Ultra-low latency Language Processing Unit (LPU) inference running open-weights models (Llama 3.3, Mixtral) at 500+ tokens/sec.",
-    authType: "BEARER",
-    pricing: "FREEMIUM",
-    latencyMs: 28,
-    uptime99: 99.91,
-    freeTierLimit: "Generous free rate limits during public preview",
-    icon: "⚡",
-    endpointsCount: 18,
-    popularityRank: 96,
-    apiKeyUrl: "https://console.groq.com/keys",
-    docsUrl: "https://console.groq.com/docs",
-    portalUrl: "https://console.groq.com"
-  },
-  {
-    id: "clerk",
-    name: "Clerk Authentication",
-    category: "Security & Identity",
-    constellation: "Ursa Major",
-    description: "Complete user management, MFA, passwordless sign-in, session tokens, organization RBAC, and webhooks.",
-    authType: "BEARER",
-    pricing: "FREEMIUM",
-    latencyMs: 42,
-    uptime99: 99.98,
-    freeTierLimit: "10,000 monthly active users 100% free with unlimited logins",
-    icon: "🔐",
-    endpointsCount: 64,
-    popularityRank: 95,
-    apiKeyUrl: "https://dashboard.clerk.com/",
-    docsUrl: "https://clerk.com/docs",
-    portalUrl: "https://dashboard.clerk.com"
-  },
-  {
-    id: "pinecone",
-    name: "Pinecone Vector DB",
-    category: "Databases & Storage",
-    constellation: "Vela",
-    description: "Managed cloud vector database built for high-throughput similarity search, dense retrieval, and AI RAG pipelines.",
-    authType: "API_KEY",
-    pricing: "FREEMIUM",
-    latencyMs: 35,
-    uptime99: 99.95,
-    freeTierLimit: "Free Starter index with 100,000 vectors & 2GB storage",
-    icon: "🌲",
-    endpointsCount: 32,
-    popularityRank: 93,
-    apiKeyUrl: "https://app.pinecone.io/",
-    docsUrl: "https://docs.pinecone.io",
-    portalUrl: "https://app.pinecone.io"
-  },
-  {
-    id: "cloudinary",
-    name: "Cloudinary Media Cloud",
-    category: "Media & Storage",
-    constellation: "Columba",
-    description: "End-to-end image and video upload, AI background removal, dynamic URL transformations, and global CDN delivery.",
-    authType: "API_KEY",
-    pricing: "FREEMIUM",
-    latencyMs: 52,
-    uptime99: 99.96,
-    freeTierLimit: "25 Monthly Credits (25,000 transformations or 25GB storage)",
-    icon: "☁️",
-    endpointsCount: 86,
-    popularityRank: 91,
-    apiKeyUrl: "https://console.cloudinary.com/settings/api-keys",
-    docsUrl: "https://cloudinary.com/documentation",
-    portalUrl: "https://console.cloudinary.com"
-  },
-  {
-    id: "algolia",
-    name: "Algolia Search & Discovery",
-    category: "Developer Tools",
-    constellation: "Serpens",
-    description: "Sub-millisecond typo-tolerant search, facet filtering, neural re-ranking, and recommendation APIs.",
-    authType: "API_KEY",
-    pricing: "FREEMIUM",
-    latencyMs: 18,
-    uptime99: 99.99,
-    freeTierLimit: "10,000 search requests / month free forever",
-    icon: "🔍",
-    endpointsCount: 54,
-    popularityRank: 92,
-    apiKeyUrl: "https://dashboard.algolia.com/account/api-keys",
-    docsUrl: "https://www.algolia.com/doc/",
-    portalUrl: "https://dashboard.algolia.com"
-  },
-  {
-    id: "mapbox",
-    name: "Mapbox Navigation & Maps",
-    category: "Location & GIS",
-    constellation: "Crux",
-    description: "High-performance vector tiles, global forward/reverse geocoding, turn-by-turn routing, and 3D terrain rendering.",
-    authType: "API_KEY",
-    pricing: "FREEMIUM",
-    latencyMs: 45,
-    uptime99: 99.93,
-    freeTierLimit: "50,000 map loads & 100,000 geocoding requests / month free",
-    icon: "🗺️",
-    endpointsCount: 42,
-    popularityRank: 90,
-    apiKeyUrl: "https://account.mapbox.com/access-tokens/",
-    docsUrl: "https://docs.mapbox.com/api/",
-    portalUrl: "https://account.mapbox.com"
-  },
-  {
-    id: "deepgram",
-    name: "Deepgram Speech AI",
-    category: "AI & Machine Learning",
-    constellation: "Fornax",
-    description: "Real-time speech-to-text, audio intelligence, diarization, and human-like text-to-speech with sub-300ms latency.",
-    authType: "API_KEY",
-    pricing: "FREEMIUM",
-    latencyMs: 68,
-    uptime99: 99.94,
-    freeTierLimit: "$200 free credit on signup (over 12,000 minutes)",
-    icon: "🎙️",
-    endpointsCount: 28,
-    popularityRank: 91,
-    apiKeyUrl: "https://console.deepgram.com/",
-    docsUrl: "https://developers.deepgram.com/",
-    portalUrl: "https://console.deepgram.com"
-  },
-  {
-    id: "huggingface",
-    name: "Hugging Face Inference",
-    category: "AI & Machine Learning",
-    constellation: "Centaurus",
-    description: "Serverless inference for 100,000+ open-source AI models across computer vision, NLP, text generation, and audio.",
-    authType: "BEARER",
-    pricing: "FREEMIUM",
-    latencyMs: 190,
-    uptime99: 99.82,
-    freeTierLimit: "Free community rate-limited inference API",
-    icon: "🤗",
-    endpointsCount: 110,
-    popularityRank: 94,
-    apiKeyUrl: "https://huggingface.co/settings/tokens",
-    docsUrl: "https://huggingface.co/docs/api-inference",
-    portalUrl: "https://huggingface.co"
-  }
-];
+interface CategoryInfo {
+  name: string;
+  icon: string;
+  count: number;
+}
 
 export default function ApiExplorerPage() {
-  const [apis, setApis] = useState<ApiItem[]>(DEFAULT_APIS);
+  const [apis, setApis] = useState<ApiItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedPricing, setSelectedPricing] = useState<string>('ALL');
+  const [selectedAuth, setSelectedAuth] = useState<string>('ALL');
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'constellation'>('grid');
   const [compareList, setCompareList] = useState<ApiItem[]>([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [collections, setCollections] = useState<string[]>([]);
+  
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalApis, setTotalApis] = useState(0);
+  const [categoriesList, setCategoriesList] = useState<CategoryInfo[]>([]);
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  // Fetch from unified /api/explorer route
   useEffect(() => {
-    fetch('http://localhost:8000/api/v1/explorer/apis')
+    let isCancelled = false;
+    setLoading(true);
+
+    const params = new URLSearchParams();
+    if (selectedCategory !== 'ALL') params.set('category', selectedCategory);
+    if (selectedPricing !== 'ALL') params.set('pricing', selectedPricing);
+    if (selectedAuth !== 'ALL') params.set('auth_type', selectedAuth);
+    if (search.trim()) params.set('search', search.trim());
+    params.set('page', page.toString());
+    params.set('limit', '36');
+
+    fetch(`/api/explorer?${params.toString()}`)
       .then((r) => r.json())
-      .then((d) => {
-        if (Array.isArray(d) && d.length > 0) {
-          setApis(d);
+      .then((data) => {
+        if (!isCancelled && data && Array.isArray(data.apis)) {
+          setApis(data.apis);
+          setTotalPages(data.totalPages || 1);
+          setTotalApis(data.total || 0);
+          if (data.categoriesSummary && Array.isArray(data.categoriesSummary.categories) && categoriesList.length === 0) {
+            setCategoriesList(data.categoriesSummary.categories);
+          }
         }
       })
-      .catch(() => {});
-  }, []);
+      .catch((err) => {
+        console.error('Failed to fetch explorer APIs:', err);
+      })
+      .finally(() => {
+        if (!isCancelled) setLoading(false);
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [search, selectedCategory, selectedPricing, selectedAuth, page, categoriesList.length]);
 
   const toggleCompare = (api: ApiItem) => {
     if (compareList.find((a) => a.id === api.id)) {
@@ -378,18 +137,15 @@ export default function ApiExplorerPage() {
     }
   };
 
-  const categories = ['ALL', 'AI & Machine Learning', 'Fintech & Billing', 'Messaging & Voice', 'Databases & Storage', 'Developer Tools', 'Security & Identity', 'Location & GIS', 'Media & Storage'];
+  const handleCategorySelect = (cat: string) => {
+    setSelectedCategory(cat);
+    setPage(1);
+  };
 
-  const filtered = apis.filter((a) => {
-    const matchesSearch =
-      a.name.toLowerCase().includes(search.toLowerCase()) ||
-      a.description.toLowerCase().includes(search.toLowerCase()) ||
-      a.constellation.toLowerCase().includes(search.toLowerCase()) ||
-      a.category.toLowerCase().includes(search.toLowerCase());
-    const matchesCat = selectedCategory === 'ALL' || a.category.toLowerCase() === selectedCategory.toLowerCase();
-    const matchesPricing = selectedPricing === 'ALL' || a.pricing === selectedPricing;
-    return matchesSearch && matchesCat && matchesPricing;
-  });
+  const handleSearchChange = (val: string) => {
+    setSearch(val);
+    setPage(1);
+  };
 
   // 3D Constellation Canvas Simulation
   useEffect(() => {
@@ -425,8 +181,8 @@ export default function ApiExplorerPage() {
       }
 
       // Constellation nodes and vector beam lines
-      const coords = filtered.slice(0, 12).map((api, i) => {
-        const count = Math.min(filtered.length, 12);
+      const coords = apis.slice(0, 16).map((api, i) => {
+        const count = Math.min(apis.length, 16);
         const angle = (i * (Math.PI * 2)) / Math.max(count, 1) + time * 0.2;
         const radius = 150 + Math.sin(time * 1.5 + i) * 25;
         return {
@@ -437,7 +193,7 @@ export default function ApiExplorerPage() {
       });
 
       // Connecting laser vectors
-      ctx.strokeStyle = 'rgba(6, 182, 212, 0.3)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
       coords.forEach((c, idx) => {
@@ -450,8 +206,8 @@ export default function ApiExplorerPage() {
 
       // Stars/Nodes
       coords.forEach((c) => {
-        ctx.fillStyle = '#00f0ff';
-        ctx.shadowColor = '#00f0ff';
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#ffffff';
         ctx.shadowBlur = 12;
         ctx.beginPath();
         ctx.arc(c.x, c.y, 5, 0, Math.PI * 2);
@@ -468,7 +224,7 @@ export default function ApiExplorerPage() {
 
     render();
     return () => cancelAnimationFrame(animId);
-  }, [viewMode, filtered]);
+  }, [viewMode, apis]);
 
   return (
     <div className="space-y-6">
@@ -476,17 +232,18 @@ export default function ApiExplorerPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-white/20 animate-ping" />
-            <span className="text-[10px] font-mono tracking-widest text-zinc-200 uppercase">
-              ORBITAL API CATALOG • REAL-WORLD PROVIDERS
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+            <span className="text-[10px] font-mono tracking-widest text-emerald-300 uppercase font-bold flex items-center gap-1.5">
+              <Database className="w-3 h-3" />
+              PUBLIC-APIS CANONICAL DATABASE INJECTED • {totalApis.toLocaleString()} APIS • 53 CATEGORIES
             </span>
           </div>
           <h1 className="text-2xl font-display font-bold text-white flex items-center gap-2.5 mt-1">
             <Compass className="w-6 h-6 text-zinc-200" />
-            <span>API EXPLORER & STAR SYSTEMS</span>
+            <span>API EXPLORER & GLOBAL REPOSITORIES</span>
           </h1>
-          <p className="text-xs text-slate-400 font-mono mt-1">
-            Direct access to official developer portals & real API key generators for world-class infrastructure
+          <p className="text-xs text-slate-300 font-mono mt-1">
+            Complete real-world public APIs catalog parsed from public-apis with real documentation, direct endpoints, CORS & HTTPS validation
           </p>
         </div>
 
@@ -521,7 +278,7 @@ export default function ApiExplorerPage() {
             </button>
             <button
               onClick={() => setViewMode('constellation')}
-              className={`p-1.5 rounded transition-colors ${viewMode === 'constellation' ? 'bg-white/10 text-zinc-200' : 'text-slate-400 hover:text-white'}`}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'constellation' ? 'bg-white/10 text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]' : 'text-zinc-400 hover:text-white hover:bg-white/[0.08]'}`}
               title="3D Constellation Map"
             >
               <Sparkles className="w-4 h-4" />
@@ -537,39 +294,71 @@ export default function ApiExplorerPage() {
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search API by provider name, constellation, category (e.g. Stripe, OpenAI, Gemini, Twilio)..."
-            className="w-full bg-white/[0.08] backdrop-blur-xl/90 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-slate-500 outline-none focus:border-white/30"
+            onChange={(e) => handleSearchChange(e.target.value)}
+            placeholder="Search across 2,190+ APIs (e.g. OpenAI, Stripe, Weather, GitHub, Currency, Anime, Blockchain)..."
+            className="w-full bg-white/[0.08] backdrop-blur-xl border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-slate-400 outline-none focus:border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]"
           />
         </div>
 
         {/* Pricing Filter */}
         <select
           value={selectedPricing}
-          onChange={(e) => setSelectedPricing(e.target.value)}
+          onChange={(e) => {
+            setSelectedPricing(e.target.value);
+            setPage(1);
+          }}
           className="bg-white/[0.08] backdrop-blur-xl border border-white/10 rounded-xl px-3 py-2.5 text-xs font-mono text-zinc-200 outline-none w-full md:w-auto"
         >
           <option value="ALL">All Pricing Tiers</option>
-          <option value="FREEMIUM">Freemium</option>
-          <option value="FREE">Free</option>
+          <option value="FREE">Free (No Card)</option>
+          <option value="FREEMIUM">Freemium Tier</option>
           <option value="PAID">Paid Only</option>
-          <option value="OPEN_SOURCE">Open Source</option>
+        </select>
+
+        {/* Auth Type Filter */}
+        <select
+          value={selectedAuth}
+          onChange={(e) => {
+            setSelectedAuth(e.target.value);
+            setPage(1);
+          }}
+          className="bg-white/[0.08] backdrop-blur-xl border border-white/10 rounded-xl px-3 py-2.5 text-xs font-mono text-zinc-200 outline-none w-full md:w-auto"
+        >
+          <option value="ALL">All Auth Models</option>
+          <option value="NONE">No Auth (Public)</option>
+          <option value="API_KEY">API Key</option>
+          <option value="OAUTH">OAuth 2.0</option>
         </select>
       </div>
 
-      {/* Category Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        {categories.map((cat) => (
+      {/* Category Pills (Dynamic from public-apis 53 Categories) */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
+        <button
+          onClick={() => handleCategorySelect('ALL')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all shrink-0 flex items-center gap-1.5 ${
+            selectedCategory === 'ALL'
+              ? 'bg-white/15 text-white border border-white/40 shadow-[0_4px_16px_rgba(255,255,255,0.2),inset_0_1px_1px_rgba(255,255,255,0.4)]'
+              : 'bg-white/[0.04] text-slate-400 hover:text-white border border-white/10 hover:bg-white/[0.08]'
+          }`}
+        >
+          <span>✨</span>
+          <span>ALL CATEGORIES</span>
+          <span className="text-[10px] opacity-75 font-bold">({totalApis})</span>
+        </button>
+
+        {categoriesList.map((cat) => (
           <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors shrink-0 ${
-              selectedCategory.toLowerCase() === cat.toLowerCase()
-                ? 'bg-white/10 text-zinc-200 border border-white/30 shadow-[0_0_12px_rgba(6,182,212,0.25)]'
-                : 'bg-white/5 text-slate-400 hover:text-white border border-white/5'
+            key={cat.name}
+            onClick={() => handleCategorySelect(cat.name)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all shrink-0 flex items-center gap-1.5 ${
+              selectedCategory.toLowerCase() === cat.name.toLowerCase()
+                ? 'bg-white/15 text-white border border-white/40 shadow-[0_4px_16px_rgba(255,255,255,0.2),inset_0_1px_1px_rgba(255,255,255,0.4)]'
+                : 'bg-white/[0.04] text-slate-400 hover:text-white border border-white/10 hover:bg-white/[0.08]'
             }`}
           >
-            {cat}
+            <span>{cat.icon}</span>
+            <span>{cat.name}</span>
+            <span className="text-[10px] opacity-60">({cat.count})</span>
           </button>
         ))}
       </div>
@@ -580,20 +369,47 @@ export default function ApiExplorerPage() {
           <canvas ref={canvasRef} width={800} height={420} className="w-full h-full object-cover" />
           <div className="absolute top-4 left-4">
             <span className="text-xs font-mono text-zinc-200 bg-white/[0.06] backdrop-blur-md px-3 py-1 rounded-full border border-white/30">
-              3D STAR MAP: {filtered.length} ACTIVE CELESTIAL NODES
+              3D STAR MAP: {apis.length} ACTIVE NODES VISUALIZED
             </span>
           </div>
         </GlassPanel>
       )}
 
+      {/* Loading state */}
+      {loading && (
+        <div className="py-20 text-center font-mono text-sm text-zinc-400 animate-pulse flex flex-col items-center justify-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+          <span>Searching public-apis database catalog...</span>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && apis.length === 0 && (
+        <div className="py-20 text-center font-mono text-sm text-zinc-400 bg-white/[0.03] rounded-3xl border border-white/10 p-8">
+          <p className="text-white font-bold text-base mb-1">No APIs found matching query</p>
+          <p className="text-xs text-zinc-400">Try adjusting your category filter, pricing tier, or search keyword.</p>
+          <button
+            onClick={() => {
+              setSelectedCategory('ALL');
+              setSelectedPricing('ALL');
+              setSelectedAuth('ALL');
+              setSearch('');
+              setPage(1);
+            }}
+            className="mt-4 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs border border-white/20 transition-all"
+          >
+            Reset Filters
+          </button>
+        </div>
+      )}
+
       {/* Grid View */}
-      {viewMode === 'grid' && (
+      {!loading && viewMode === 'grid' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtered.map((api) => {
+          {apis.map((api) => {
             const isComparing = !!compareList.find((a) => a.id === api.id);
             const inCollection = collections.includes(api.id);
-            const apiKeyUrl = api.apiKeyUrl || `https://www.google.com/search?q=${encodeURIComponent(api.name + ' api key console')}`;
-            const docsUrl = api.docsUrl || `https://www.google.com/search?q=${encodeURIComponent(api.name + ' api documentation')}`;
+            const targetUrl = api.docsUrl || api.url || `https://www.google.com/search?q=${encodeURIComponent(api.name + ' api')}`;
 
             return (
               <GlassPanel key={api.id} glow="cyan" className="p-5 flex flex-col justify-between group">
@@ -608,11 +424,11 @@ export default function ApiExplorerPage() {
                           {api.name}
                         </h3>
                         <span className="text-[10px] font-mono text-zinc-300">
-                          Constellation: {api.constellation} • {api.category}
+                          {api.category} • {api.constellation}
                         </span>
                       </div>
                     </div>
-                    <Badge variant={api.pricing === 'FREE' || api.pricing === 'OPEN_SOURCE' || api.pricing === 'FREEMIUM' ? 'healthy' : 'neutral'}>
+                    <Badge variant={api.pricing === 'FREE' ? 'healthy' : 'neutral'}>
                       {api.pricing}
                     </Badge>
                   </div>
@@ -620,11 +436,34 @@ export default function ApiExplorerPage() {
                   <p className="text-xs text-zinc-300 line-clamp-2 mt-2 leading-relaxed">
                     {api.description}
                   </p>
+
+                  {/* Badges for HTTPS, CORS, Auth */}
+                  <div className="flex flex-wrap items-center gap-1.5 mt-3">
+                    {api.https ? (
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5" /> HTTPS
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30">
+                        HTTP Only
+                      </span>
+                    )}
+
+                    {api.cors && api.cors !== 'Unknown' && (
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-mono border ${api.cors.toLowerCase() === 'yes' ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30' : 'bg-amber-500/15 text-amber-300 border-amber-500/30'}`}>
+                        CORS: {api.cors}
+                      </span>
+                    )}
+
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-mono bg-white/[0.08] text-zinc-200 border border-white/20">
+                      {api.authRaw && api.authRaw !== 'No' ? `Auth: ${api.authRaw}` : 'Open (No Auth)'}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-white/10 space-y-2.5 text-xs font-mono">
                   <div className="flex justify-between text-zinc-400">
-                    <span>Free Quota:</span>
+                    <span>Access Tier:</span>
                     <span className="text-white text-right font-sans text-[11px] truncate max-w-[200px]" title={api.freeTierLimit}>
                       {api.freeTierLimit}
                     </span>
@@ -636,39 +475,25 @@ export default function ApiExplorerPage() {
                       {api.uptime99}% / {api.latencyMs}ms
                     </span>
                   </div>
-                  <div className="flex justify-between text-zinc-400">
-                    <span>Auth:</span>
-                    <span className="text-zinc-200">{api.authType}</span>
-                  </div>
 
-                  {/* Primary Action: Direct Real API Key Page - Transparent Glass Capsule */}
+                  {/* Primary Action: Direct Provider Link */}
                   <div className="pt-2 space-y-2">
                     <a
-                      href={apiKeyUrl}
+                      href={targetUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full py-2 px-3 rounded-full bg-white/10 hover:bg-white/10 backdrop-blur-xl text-white border border-white/30 hover:border-white shadow-[0_8px_20px_rgba(255,255,255,0.3),inset_0_1.5px_1px_rgba(255,255,255,0.7)] flex items-center justify-center gap-2 font-mono text-xs font-bold transition-all active:scale-[0.98]"
+                      className="w-full py-2 px-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white border border-white/30 hover:border-white shadow-[0_8px_20px_rgba(255,255,255,0.2),inset_0_1.5px_1px_rgba(255,255,255,0.7)] flex items-center justify-center gap-2 font-mono text-xs font-bold transition-all active:scale-[0.98]"
                     >
-                      <KeyRound className="w-3.5 h-3.5 text-white" />
-                      <span>Get Real API Key</span>
+                      <Globe2 className="w-3.5 h-3.5 text-white" />
+                      <span>Visit Provider & Docs</span>
                       <ArrowUpRight className="w-3 h-3 text-white" />
                     </a>
 
                     {/* Secondary Navigation Tools */}
                     <div className="flex items-center gap-2">
-                      <a
-                        href={docsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 py-1.5 px-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/20 text-[11px] font-mono text-zinc-200 hover:text-white flex items-center justify-center gap-1.5 transition-colors shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
-                      >
-                        <BookOpen className="w-3 h-3 text-zinc-400" />
-                        <span>Docs</span>
-                      </a>
-
                       <Link
-                        href={`/playground?service=${encodeURIComponent(api.name)}`}
-                        className="flex-1 py-1.5 px-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/20 text-[11px] font-mono text-white hover:text-white flex items-center justify-center gap-1.5 transition-colors shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
+                        href={`/playground?service=${encodeURIComponent(api.name)}&endpoint=${encodeURIComponent(api.url || '')}`}
+                        className="flex-1 py-1.5 px-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/20 text-[11px] font-mono text-white flex items-center justify-center gap-1.5 transition-colors shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
                       >
                         <PlaySquare className="w-3 h-3 text-white" />
                         <span>Playground</span>
@@ -678,7 +503,7 @@ export default function ApiExplorerPage() {
                         onClick={() => toggleCompare(api)}
                         className={`py-1.5 px-2.5 rounded-xl border text-[11px] font-mono flex items-center justify-center gap-1 transition-all backdrop-blur-md ${
                           isComparing
-                            ? 'bg-white/10 border-white/40 text-white shadow-[0_0_10px_rgba(255,255,255,0.3)]'
+                            ? 'bg-white/20 border-white text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]'
                             : 'bg-white/[0.06] border-white/20 text-zinc-300 hover:text-white hover:bg-white/[0.12] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]'
                         }`}
                         title={isComparing ? 'Remove from Compare' : 'Add to Compare'}
@@ -690,12 +515,12 @@ export default function ApiExplorerPage() {
                         onClick={() => toggleCollection(api.id)}
                         className={`py-1.5 px-2.5 rounded-xl border text-[11px] font-mono flex items-center justify-center gap-1 transition-all backdrop-blur-md ${
                           inCollection
-                            ? 'bg-white/10 border-amber-400 text-zinc-200 shadow-[0_0_10px_rgba(245,158,11,0.4)]'
+                            ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.4)]'
                             : 'bg-white/[0.06] border-white/20 text-zinc-300 hover:text-white hover:bg-white/[0.12] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]'
                         }`}
                         title={inCollection ? 'Saved to Collection' : 'Save to Collection'}
                       >
-                        {inCollection ? <Check className="w-3 h-3 text-zinc-200" /> : <Plus className="w-3 h-3" />}
+                        {inCollection ? <Check className="w-3 h-3 text-amber-300" /> : <Plus className="w-3 h-3" />}
                       </button>
                     </div>
                   </div>
@@ -707,11 +532,11 @@ export default function ApiExplorerPage() {
       )}
 
       {/* List View */}
-      {viewMode === 'list' && (
+      {!loading && viewMode === 'list' && (
         <div className="space-y-3">
-          {filtered.map((api) => {
+          {apis.map((api) => {
             const isComparing = !!compareList.find((a) => a.id === api.id);
-            const apiKeyUrl = api.apiKeyUrl || `https://www.google.com/search?q=${encodeURIComponent(api.name + ' api key console')}`;
+            const targetUrl = api.docsUrl || api.url || `https://www.google.com/search?q=${encodeURIComponent(api.name + ' api')}`;
 
             return (
               <GlassPanel key={api.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -720,14 +545,15 @@ export default function ApiExplorerPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-display font-bold text-sm text-white">{api.name}</h3>
-                      <Badge variant="neutral">{api.constellation}</Badge>
+                      <Badge variant="neutral">{api.category}</Badge>
                       <Badge variant={api.pricing === 'FREE' ? 'healthy' : 'neutral'}>{api.pricing}</Badge>
+                      {api.https && <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-emerald-500/20 text-emerald-300">HTTPS</span>}
                     </div>
                     <p className="text-xs text-zinc-300 mt-0.5 line-clamp-1">{api.description}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs font-mono">
+                <div className="flex items-center gap-3 text-xs font-mono shrink-0">
                   <div className="text-zinc-400 hidden lg:block">
                     <span>Latency:</span> <span className="text-zinc-200">{api.latencyMs}ms</span>
                   </div>
@@ -736,26 +562,26 @@ export default function ApiExplorerPage() {
                   </div>
 
                   <a
-                    href={apiKeyUrl}
+                    href={targetUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="py-1.5 px-3 rounded-full bg-white/10 hover:bg-white/10 backdrop-blur-xl text-white border border-white/30 flex items-center gap-1.5 transition-all font-mono text-xs font-bold shadow-[0_6px_16px_rgba(255,255,255,0.3),inset_0_1.5px_1px_rgba(255,255,255,0.7)]"
+                    className="py-1.5 px-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white border border-white/30 flex items-center gap-1.5 transition-all font-mono text-xs font-bold shadow-[0_6px_16px_rgba(255,255,255,0.2),inset_0_1.5px_1px_rgba(255,255,255,0.7)]"
                   >
-                    <KeyRound className="w-3.5 h-3.5 text-white" />
-                    <span>Get Key</span>
+                    <Globe2 className="w-3.5 h-3.5 text-white" />
+                    <span>Visit</span>
                     <ArrowUpRight className="w-3 h-3 text-white" />
                   </a>
 
                   <button
                     onClick={() => toggleCompare(api)}
                     className={`px-3 py-1.5 rounded-xl border text-xs font-mono backdrop-blur-md ${
-                      isComparing ? 'bg-white/10 border-white/40 text-white shadow-[0_0_10px_rgba(255,255,255,0.3)]' : 'bg-white/[0.06] border-white/20 text-zinc-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]'
+                      isComparing ? 'bg-white/20 border-white text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]' : 'bg-white/[0.06] border-white/20 text-zinc-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]'
                     }`}
                   >
                     {isComparing ? 'Comparing' : 'Compare'}
                   </button>
 
-                  <Link href={`/playground?service=${encodeURIComponent(api.name)}`}>
+                  <Link href={`/playground?service=${encodeURIComponent(api.name)}&endpoint=${encodeURIComponent(api.url || '')}`}>
                     <SpaceButton size="sm" variant="secondary">
                       Playground
                     </SpaceButton>
@@ -764,6 +590,45 @@ export default function ApiExplorerPage() {
               </GlassPanel>
             );
           })}
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {!loading && totalApis > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-white/10 font-mono text-xs">
+          <div className="text-zinc-400">
+            Showing <span className="text-white font-bold">{(page - 1) * 36 + 1}</span> to <span className="text-white font-bold">{Math.min(page * 36, totalApis)}</span> of <span className="text-white font-bold">{totalApis.toLocaleString()}</span> Public APIs
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                setPage((p) => Math.max(1, p - 1));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              disabled={page <= 1}
+              className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] disabled:opacity-30 disabled:cursor-not-allowed border border-white/20 text-white flex items-center gap-1 transition-all"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              <span>Previous</span>
+            </button>
+
+            <span className="text-zinc-300 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10">
+              Page <span className="text-white font-bold">{page}</span> of <span className="text-white font-bold">{totalPages}</span>
+            </span>
+
+            <button
+              onClick={() => {
+                setPage((p) => Math.min(totalPages, p + 1));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              disabled={page >= totalPages}
+              className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] disabled:opacity-30 disabled:cursor-not-allowed border border-white/20 text-white flex items-center gap-1 transition-all"
+            >
+              <span>Next</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       )}
 
@@ -789,7 +654,7 @@ export default function ApiExplorerPage() {
                     <span className="text-2xl p-1.5 rounded-xl bg-white/[0.08] border border-white/10">{c.icon}</span>
                     <div>
                       <h3 className="font-display font-bold text-sm text-white">{c.name}</h3>
-                      <span className="text-[10px] text-white">{c.constellation}</span>
+                      <span className="text-[10px] text-zinc-300">{c.category}</span>
                     </div>
                   </div>
 
@@ -804,7 +669,7 @@ export default function ApiExplorerPage() {
                     </div>
                     <div>
                       <span className="text-slate-500 block">Auth Mechanism</span>
-                      <span className="text-slate-200">{c.authType}</span>
+                      <span className="text-slate-200">{c.authRaw || c.authType}</span>
                     </div>
                     <div>
                       <span className="text-slate-500 block">p95 Latency</span>
@@ -817,13 +682,13 @@ export default function ApiExplorerPage() {
                   </div>
 
                   <a
-                    href={c.apiKeyUrl || `https://www.google.com/search?q=${encodeURIComponent(c.name + ' api key console')}`}
+                    href={c.docsUrl || c.url || `https://www.google.com/search?q=${encodeURIComponent(c.name + ' api')}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-2 px-3 rounded-lg bg-white/10 hover:bg-white/10 text-zinc-200 border border-white/30 flex items-center justify-center gap-1.5 transition-colors font-mono text-xs font-semibold"
+                    className="w-full py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/30 flex items-center justify-center gap-1.5 transition-all font-mono text-xs font-semibold"
                   >
-                    <KeyRound className="w-3.5 h-3.5" />
-                    <span>Get Key ({c.name})</span>
+                    <Globe2 className="w-3.5 h-3.5" />
+                    <span>Open Provider</span>
                     <ArrowUpRight className="w-3 h-3" />
                   </a>
                 </div>

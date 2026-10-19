@@ -1,8 +1,12 @@
-from fastapi import APIRouter
+import os
+import json
+from typing import Optional, List
+from fastapi import APIRouter, Query
 
 router = APIRouter(prefix="/explorer", tags=["API Explorer"])
 
-CATALOG = [
+# Flagship curated APIs
+FLAGSHIP_CATALOG = [
     {
         "id": "stripe",
         "name": "Stripe Payments",
@@ -20,6 +24,8 @@ CATALOG = [
         "apiKeyUrl": "https://dashboard.stripe.com/apikeys",
         "docsUrl": "https://stripe.com/docs/api",
         "portalUrl": "https://dashboard.stripe.com",
+        "https": True,
+        "cors": "Yes",
         "quickSetupSnippet": "curl https://api.stripe.com/v1/charges -u sk_test_...:"
     },
     {
@@ -39,6 +45,8 @@ CATALOG = [
         "apiKeyUrl": "https://platform.openai.com/api-keys",
         "docsUrl": "https://platform.openai.com/docs",
         "portalUrl": "https://platform.openai.com",
+        "https": True,
+        "cors": "Yes",
         "quickSetupSnippet": "curl https://api.openai.com/v1/chat/completions -H 'Authorization: Bearer sk-...' -d '{\"model\":\"gpt-4o-mini\",\"messages\":[{\"role\":\"user\",\"content\":\"Hello\"}]}'"
     },
     {
@@ -58,6 +66,8 @@ CATALOG = [
         "apiKeyUrl": "https://aistudio.google.com/app/apikey",
         "docsUrl": "https://ai.google.dev/gemini-api/docs",
         "portalUrl": "https://aistudio.google.com",
+        "https": True,
+        "cors": "Yes",
         "quickSetupSnippet": "curl 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=YOUR_KEY' -H 'Content-Type: application/json' -d '{\"contents\":[{\"parts\":[{\"text\":\"Hello\"}]}]}'"
     },
     {
@@ -77,6 +87,8 @@ CATALOG = [
         "apiKeyUrl": "https://console.anthropic.com/settings/keys",
         "docsUrl": "https://docs.anthropic.com",
         "portalUrl": "https://console.anthropic.com",
+        "https": True,
+        "cors": "Yes",
         "quickSetupSnippet": "curl https://api.anthropic.com/v1/messages -H 'x-api-key: sk-ant-...' -H 'anthropic-version: 2023-06-01' -d '{\"model\":\"claude-3-5-sonnet-20241022\",\"max_tokens\":1024,\"messages\":[{\"role\":\"user\",\"content\":\"Hi\"}]}'"
     },
     {
@@ -96,146 +108,99 @@ CATALOG = [
         "apiKeyUrl": "https://console.twilio.com/",
         "docsUrl": "https://www.twilio.com/docs",
         "portalUrl": "https://console.twilio.com",
+        "https": True,
+        "cors": "Yes",
         "quickSetupSnippet": "curl -X POST https://api.twilio.com/2010-04-01/Accounts/$TWILIO_ACCOUNT_SID/Messages.json -u $TWILIO_ACCOUNT_SID:$TWILIO_AUTH_TOKEN"
     },
     {
-        "id": "github",
-        "name": "GitHub REST & GraphQL",
-        "category": "Developer Tools",
-        "constellation": "Cassiopeia",
-        "description": "Automate repositories, issues, PRs, actions, git trees, security advisories, and webhooks.",
-        "authType": "BEARER",
-        "pricing": "OPEN_SOURCE",
-        "latencyMs": 62,
-        "uptime99": 99.92,
-        "freeTierLimit": "5,000 req/hr authenticated free across all personal accounts",
-        "icon": "🐙",
-        "endpointsCount": 320,
-        "popularityRank": 97,
-        "apiKeyUrl": "https://github.com/settings/tokens",
-        "docsUrl": "https://docs.github.com/en/rest",
-        "portalUrl": "https://github.com/settings/developers",
-        "quickSetupSnippet": "curl -H 'Authorization: Bearer ghp_...' https://api.github.com/user"
-    },
-    {
         "id": "supabase",
-        "name": "Supabase Platform",
+        "name": "Supabase PostgreSQL",
         "category": "Databases & Storage",
         "constellation": "Lyra",
-        "description": "The open-source Firebase alternative: Postgres DB, pgvector, row-level security, Auth, Realtime, and Edge Functions.",
+        "description": "Open source Firebase alternative: instant Postgres database, Auth, Realtime edge subscriptions, Storage, and Vector.",
         "authType": "API_KEY",
         "pricing": "FREEMIUM",
-        "latencyMs": 48,
+        "latencyMs": 42,
         "uptime99": 99.97,
-        "freeTierLimit": "2 free active projects, 500MB DB, 50,000 monthly active users",
+        "freeTierLimit": "2 free projects, 500MB DB, 50,000 MAU, 1GB storage",
         "icon": "⚡",
-        "endpointsCount": 78,
-        "popularityRank": 95,
-        "apiKeyUrl": "https://supabase.com/dashboard/project/_/settings/api",
+        "endpointsCount": 58,
+        "popularityRank": 96,
+        "apiKeyUrl": "https://app.supabase.com/project/_/settings/api",
         "docsUrl": "https://supabase.com/docs",
-        "portalUrl": "https://supabase.com/dashboard",
-        "quickSetupSnippet": "curl 'https://<project-ref>.supabase.co/rest/v1/items' -H 'apikey: <anon-key>' -H 'Authorization: Bearer <anon-key>'"
+        "portalUrl": "https://supabase.com",
+        "https": True,
+        "cors": "Yes",
+        "quickSetupSnippet": "curl 'https://<project-ref>.supabase.co/rest/v1/todos' -H 'apikey: <anon-key>' -H 'Authorization: Bearer <anon-key>'"
     },
     {
         "id": "resend",
-        "name": "Resend Email",
+        "name": "Resend Modern Email",
         "category": "Messaging & Voice",
-        "constellation": "Pegasus",
-        "description": "Modern developer-first transactional email API with React Email components, domain verification, and high deliverability.",
-        "authType": "BEARER",
+        "constellation": "Cassiopeia",
+        "description": "Developer-first email delivery platform built on React Email, exceptional deliverability, and real-time open webhooks.",
+        "authType": "API_KEY",
         "pricing": "FREEMIUM",
-        "latencyMs": 55,
+        "latencyMs": 95,
         "uptime99": 99.99,
-        "freeTierLimit": "3,000 emails / month free with custom domain",
-        "icon": "✉️",
-        "endpointsCount": 24,
+        "freeTierLimit": "3,000 emails/month free, 100 emails/day",
+        "icon": "📧",
+        "endpointsCount": 14,
         "popularityRank": 94,
         "apiKeyUrl": "https://resend.com/api-keys",
-        "docsUrl": "https://resend.com/docs",
+        "docsUrl": "https://resend.com/docs/api-reference",
         "portalUrl": "https://resend.com",
-        "quickSetupSnippet": "curl -X POST https://api.resend.com/emails -H 'Authorization: Bearer re_...' -H 'Content-Type: application/json' -d '{\"from\":\"onboarding@resend.dev\",\"to\":\"you@example.com\",\"subject\":\"Hello\",\"html\":\"<p>APIVerse</p>\"}'"
+        "https": True,
+        "cors": "Yes",
+        "quickSetupSnippet": "curl -X POST 'https://api.resend.com/emails' -H 'Authorization: Bearer re_...' -H 'Content-Type: application/json' -d '{\"from\":\"onboarding@resend.dev\",\"to\":\"delivered@resend.dev\",\"subject\":\"Hello\",\"html\":\"<p>Hi</p>\"}'"
     },
     {
-        "id": "groq",
-        "name": "Groq LPU Inference",
-        "category": "AI & Machine Learning",
-        "constellation": "Aquila",
-        "description": "Ultra-low latency Language Processing Unit (LPU) inference running open-weights models (Llama 3.3, Mixtral) at 500+ tokens/sec.",
+        "id": "github-api",
+        "name": "GitHub REST & GraphQL",
+        "category": "Developer Tools",
+        "constellation": "Phoenix",
+        "description": "Programmatic interface to code repositories, pull requests, actions workflows, GitHub issues, and developer graphs.",
         "authType": "BEARER",
-        "pricing": "FREEMIUM",
-        "latencyMs": 28,
-        "uptime99": 99.91,
-        "freeTierLimit": "Generous free rate limits during public preview",
-        "icon": "⚡",
-        "endpointsCount": 18,
-        "popularityRank": 96,
-        "apiKeyUrl": "https://console.groq.com/keys",
-        "docsUrl": "https://console.groq.com/docs",
-        "portalUrl": "https://console.groq.com",
-        "quickSetupSnippet": "curl -X POST https://api.groq.com/openai/v1/chat/completions -H 'Authorization: Bearer gsk_...' -d '{\"model\":\"llama-3.3-70b-versatile\",\"messages\":[{\"role\":\"user\",\"content\":\"Hi\"}]}'"
+        "pricing": "FREE",
+        "latencyMs": 75,
+        "uptime99": 99.96,
+        "freeTierLimit": "5,000 requests/hour authenticated, 60/hr unauth",
+        "icon": "🐙",
+        "endpointsCount": 340,
+        "popularityRank": 99,
+        "apiKeyUrl": "https://github.com/settings/tokens",
+        "docsUrl": "https://docs.github.com/en/rest",
+        "portalUrl": "https://github.com",
+        "https": True,
+        "cors": "Yes",
+        "quickSetupSnippet": "curl -H 'Accept: application/vnd.github+json' -H 'Authorization: Bearer ghp_...' https://api.github.com/user"
     },
     {
         "id": "clerk",
-        "name": "Clerk Authentication",
+        "name": "Clerk Auth & User Management",
         "category": "Security & Identity",
-        "constellation": "Ursa Major",
-        "description": "Complete user management, MFA, passwordless sign-in, session tokens, organization RBAC, and webhooks.",
+        "constellation": "Andromeda",
+        "description": "Complete user authentication, session security, multi-factor auth, passkeys, and organization tenant management.",
         "authType": "BEARER",
         "pricing": "FREEMIUM",
-        "latencyMs": 42,
-        "uptime99": 99.98,
-        "freeTierLimit": "10,000 monthly active users 100% free with unlimited logins",
-        "icon": "🔐",
-        "endpointsCount": 64,
+        "latencyMs": 52,
+        "uptime99": 99.99,
+        "freeTierLimit": "10,000 monthly active users (MAU) completely free",
+        "icon": "🛡️",
+        "endpointsCount": 62,
         "popularityRank": 95,
-        "apiKeyUrl": "https://dashboard.clerk.com/",
+        "apiKeyUrl": "https://dashboard.clerk.com",
         "docsUrl": "https://clerk.com/docs",
         "portalUrl": "https://dashboard.clerk.com",
-        "quickSetupSnippet": "curl https://api.clerk.com/v1/users -H 'Authorization: Bearer sk_live_...'"
-    },
-    {
-        "id": "pinecone",
-        "name": "Pinecone Vector DB",
-        "category": "Databases & Storage",
-        "constellation": "Vela",
-        "description": "Managed cloud vector database built for high-throughput similarity search, dense retrieval, and AI RAG pipelines.",
-        "authType": "API_KEY",
-        "pricing": "FREEMIUM",
-        "latencyMs": 35,
-        "uptime99": 99.95,
-        "freeTierLimit": "Free Starter index with 100,000 vectors & 2GB storage",
-        "icon": "🌲",
-        "endpointsCount": 32,
-        "popularityRank": 93,
-        "apiKeyUrl": "https://app.pinecone.io/",
-        "docsUrl": "https://docs.pinecone.io",
-        "portalUrl": "https://app.pinecone.io",
-        "quickSetupSnippet": "curl -X GET https://api.pinecone.io/indexes -H 'Api-Key: pcsk_...'"
-    },
-    {
-        "id": "cloudinary",
-        "name": "Cloudinary Media Cloud",
-        "category": "Media & Storage",
-        "constellation": "Columba",
-        "description": "End-to-end image and video upload, AI background removal, dynamic URL transformations, and global CDN delivery.",
-        "authType": "API_KEY",
-        "pricing": "FREEMIUM",
-        "latencyMs": 52,
-        "uptime99": 99.96,
-        "freeTierLimit": "25 Monthly Credits (25,000 transformations or 25GB storage)",
-        "icon": "☁️",
-        "endpointsCount": 86,
-        "popularityRank": 91,
-        "apiKeyUrl": "https://console.cloudinary.com/settings/api-keys",
-        "docsUrl": "https://cloudinary.com/documentation",
-        "portalUrl": "https://console.cloudinary.com",
-        "quickSetupSnippet": "curl https://api.cloudinary.com/v1_1/<cloud_name>/image/upload -F 'file=@sample.jpg' -F 'api_key=<api_key>'"
+        "https": True,
+        "cors": "Yes",
+        "quickSetupSnippet": "curl https://api.clerk.com/v1/users -H 'Authorization: Bearer sk_test_...'"
     },
     {
         "id": "algolia",
         "name": "Algolia Search & Discovery",
         "category": "Developer Tools",
-        "constellation": "Serpens",
+        "constellation": "Ursa Major",
         "description": "Sub-millisecond typo-tolerant search, facet filtering, neural re-ranking, and recommendation APIs.",
         "authType": "API_KEY",
         "pricing": "FREEMIUM",
@@ -248,12 +213,14 @@ CATALOG = [
         "apiKeyUrl": "https://dashboard.algolia.com/account/api-keys",
         "docsUrl": "https://www.algolia.com/doc/",
         "portalUrl": "https://dashboard.algolia.com",
-        "quickSetupSnippet": "curl -X POST https://<app_id>-dsn.algolia.net/1/indexes/<index_name>/query -H 'X-Algolia-API-Key: ...' -H 'X-Algolia-Application-Id: ...' -d '{\"query\":\"phone\"}'"
+        "https": True,
+        "cors": "Yes",
+        "quickSetupSnippet": "curl -X POST https://<APP_ID>.algolia.net/1/indexes/<INDEX>/query -H 'X-Algolia-API-Key: ...' -H 'X-Algolia-Application-Id: ...'"
     },
     {
         "id": "mapbox",
         "name": "Mapbox Navigation & Maps",
-        "category": "Location & GIS",
+        "category": "Geocoding",
         "constellation": "Crux",
         "description": "High-performance vector tiles, global forward/reverse geocoding, turn-by-turn routing, and 3D terrain rendering.",
         "authType": "API_KEY",
@@ -267,13 +234,15 @@ CATALOG = [
         "apiKeyUrl": "https://account.mapbox.com/access-tokens/",
         "docsUrl": "https://docs.mapbox.com/api/",
         "portalUrl": "https://account.mapbox.com",
-        "quickSetupSnippet": "curl 'https://api.mapbox.com/geocoding/v5/mapbox.places/Los+Angeles.json?access_token=pk.eyJ...'"
+        "https": True,
+        "cors": "Yes",
+        "quickSetupSnippet": "curl 'https://api.mapbox.com/geocoding/v5/mapbox.places/Los%20Angeles.json?access_token=pk....'"
     },
     {
         "id": "deepgram",
         "name": "Deepgram Speech AI",
-        "category": "AI & Machine Learning",
-        "constellation": "Fornax",
+        "category": "Machine Learning",
+        "constellation": "Vela",
         "description": "Real-time speech-to-text, audio intelligence, diarization, and human-like text-to-speech with sub-300ms latency.",
         "authType": "API_KEY",
         "pricing": "FREEMIUM",
@@ -286,12 +255,14 @@ CATALOG = [
         "apiKeyUrl": "https://console.deepgram.com/",
         "docsUrl": "https://developers.deepgram.com/",
         "portalUrl": "https://console.deepgram.com",
+        "https": True,
+        "cors": "Yes",
         "quickSetupSnippet": "curl -X POST 'https://api.deepgram.com/v1/listen' -H 'Authorization: Token ...' -H 'Content-Type: audio/wav' --data-binary @audio.wav"
     },
     {
         "id": "huggingface",
         "name": "Hugging Face Inference",
-        "category": "AI & Machine Learning",
+        "category": "Machine Learning",
         "constellation": "Centaurus",
         "description": "Serverless inference for 100,000+ open-source AI models across computer vision, NLP, text generation, and audio.",
         "authType": "BEARER",
@@ -305,22 +276,98 @@ CATALOG = [
         "apiKeyUrl": "https://huggingface.co/settings/tokens",
         "docsUrl": "https://huggingface.co/docs/api-inference",
         "portalUrl": "https://huggingface.co",
+        "https": True,
+        "cors": "Yes",
         "quickSetupSnippet": "curl https://api-inference.huggingface.co/models/bert-base-uncased -H 'Authorization: Bearer hf_...' -d '{\"inputs\":\"Today is a [MASK] day.\"}'"
     }
 ]
 
+# Load full public_apis.json database
+DATA_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "public_apis.json")
+CATEGORIES_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "categories.json")
+
+def load_catalog() -> List[dict]:
+    catalog = list(FLAGSHIP_CATALOG)
+    seen_names = set(a["name"].lower() for a in catalog)
+    if os.path.exists(DATA_PATH):
+        try:
+            with open(DATA_PATH, "r", encoding="utf-8") as f:
+                apis = json.load(f)
+                for api in apis:
+                    if api["name"].lower() not in seen_names:
+                        catalog.append(api)
+                        seen_names.add(api["name"].lower())
+        except Exception as e:
+            print(f"Warning: Failed to load public_apis.json: {e}")
+    return catalog
+
+CATALOG = load_catalog()
+
 @router.get("/apis")
-async def list_apis(category: str = None, pricing: str = None):
+async def list_apis(
+    category: Optional[str] = None,
+    pricing: Optional[str] = None,
+    search: Optional[str] = None,
+    auth_type: Optional[str] = None,
+    limit: Optional[int] = None,
+    offset: int = 0
+):
     results = CATALOG
     if category and category != "ALL":
-        results = [a for a in results if a["category"].lower() == category.lower()]
+        results = [a for a in results if a.get("category", "").lower() == category.lower()]
     if pricing and pricing != "ALL":
-        results = [a for a in results if a["pricing"].lower() == pricing.lower()]
+        results = [a for a in results if a.get("pricing", "").lower() == pricing.lower()]
+    if auth_type and auth_type != "ALL":
+        results = [a for a in results if a.get("authType", "").lower() == auth_type.lower()]
+    if search:
+        s = search.lower()
+        results = [
+            a for a in results
+            if s in a.get("name", "").lower()
+            or s in a.get("description", "").lower()
+            or s in a.get("category", "").lower()
+            or s in a.get("constellation", "").lower()
+        ]
+    
+    if limit is not None and limit > 0:
+        return results[offset : offset + limit]
     return results
+
+@router.get("/categories")
+async def list_categories():
+    if os.path.exists(CATEGORIES_PATH):
+        try:
+            with open(CATEGORIES_PATH, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    
+    # Fallback compute dynamically
+    cats = sorted(list(set(a.get("category", "General") for a in CATALOG)))
+    return {
+        "total_apis": len(CATALOG),
+        "total_categories": len(cats),
+        "categories": [{"name": c, "icon": "✨", "count": sum(1 for a in CATALOG if a.get("category") == c)} for c in cats]
+    }
+
+@router.get("/stats")
+async def get_stats():
+    total = len(CATALOG)
+    free_count = sum(1 for a in CATALOG if a.get("pricing") == "FREE" or a.get("authType") == "NONE")
+    https_count = sum(1 for a in CATALOG if a.get("https") is True)
+    categories = sorted(list(set(a.get("category", "General") for a in CATALOG)))
+    return {
+        "totalApis": total,
+        "totalCategories": len(categories),
+        "totalFree": free_count,
+        "totalHttps": https_count,
+        "status": "LIVE",
+        "source": "public-apis/public-apis database injected"
+    }
 
 @router.get("/compare")
 async def compare_apis(api_ids: str):
-    ids = api_ids.split(",")
+    ids = [i.strip() for i in api_ids.split(",")]
     matched = [a for a in CATALOG if a["id"] in ids]
     return {
         "compared": matched,
