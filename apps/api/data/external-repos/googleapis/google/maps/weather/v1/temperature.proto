@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package google.maps.weather.v1;
+
+import "google/api/field_behavior.proto";
+
+option java_multiple_files = true;
+option java_package = "com.google.maps.weather.v1";
+option java_outer_classname = "TemperatureProto";
+option go_package = "cloud.google.com/go/maps/weather/apiv1/weatherpb;weatherpb";
+option csharp_namespace = "Google.Geo.Weather.V1";
+option php_namespace = "Google\\Geo\\Weather\\V1";
+option objc_class_prefix = "GMWV1";
+
+// Represents a temperature value.
+// (-- Next available tag: 3 --)
+message Temperature {
+  // The temperature value (in degrees) in the specified unit.
+  optional float degrees = 1;
+
+  // Represents a unit used to measure temperatures.
+  enum Unit {
+    // The temperature unit is unspecified.
+    UNIT_UNSPECIFIED = 0;
+
+    // The temperature is measured in Celsius.
+    CELSIUS = 1;
+
+    // The temperature is measured in Fahrenheit.
+    FAHRENHEIT = 2;
+  }
+  // The code for the unit used to measure the temperature value.
+  // (-- aip.dev/not-precedent: Field type changed to nested enum per atomic
+  //     transition strategy. Wire-compatible; external consumers
+  //     rely exclusively on HTTP REST/JSON where enum strings remain identical.
+  //     --)
+  Unit unit = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Represents a unit used to measure temperatures.
+// (-- This is a generic (shared) definition because it maybe used as a
+// standalone field for other endpoints/new features in the future and it
+// already contains all the possible temperature units. --)
+// (-- Next available tag: 3 --)
+enum TemperatureUnit {
+  // The temperature unit is unspecified.
+  TEMPERATURE_UNIT_UNSPECIFIED = 0;
+
+  // The temperature is measured in Celsius.
+  CELSIUS = 1;
+
+  // The temperature is measured in Fahrenheit.
+  FAHRENHEIT = 2;
+}

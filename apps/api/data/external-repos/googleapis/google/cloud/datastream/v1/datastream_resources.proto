@@ -1,0 +1,2536 @@
+// Copyright 2026 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.datastream.v1;
+
+import "google/api/field_behavior.proto";
+import "google/api/field_info.proto";
+import "google/api/resource.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "Google.Cloud.Datastream.V1";
+option go_package = "cloud.google.com/go/datastream/apiv1/datastreampb;datastreampb";
+option java_multiple_files = true;
+option java_outer_classname = "DatastreamResourcesProto";
+option java_package = "com.google.cloud.datastream.v1";
+option php_namespace = "Google\\Cloud\\Datastream\\V1";
+option ruby_package = "Google::Cloud::Datastream::V1";
+option (google.api.resource_definition) = {
+  type: "compute.googleapis.com/Networks"
+  pattern: "projects/{project}/global/networks/{network}"
+};
+option (google.api.resource_definition) = {
+  type: "compute.googleapis.com/NetworkAttachment"
+  pattern: "projects/{project}/regions/{region}/networkAttachments/{network_attachment}"
+};
+option (google.api.resource_definition) = {
+  type: "spanner.googleapis.com/Database"
+  pattern: "projects/{project}/instances/{instance}/databases/{database}"
+};
+
+// Profile for connecting to an Oracle source.
+message OracleProfile {
+  // Required. Hostname for the Oracle connection.
+  string hostname = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Port for the Oracle connection, default value is 1521.
+  int32 port = 2;
+
+  // Required. Username for the Oracle connection.
+  string username = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Password for the Oracle connection. Mutually exclusive with the
+  // `secret_manager_stored_password` field.
+  string password = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Required. Database for the Oracle connection.
+  string database_service = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Connection string attributes
+  map<string, string> connection_attributes = 6;
+
+  // Optional. SSL configuration for the Oracle connection.
+  OracleSslConfig oracle_ssl_config = 7
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Configuration for Oracle ASM connection.
+  OracleAsmConfig oracle_asm_config = 8
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A reference to a Secret Manager resource name storing the Oracle
+  // connection password. Mutually exclusive with the `password` field.
+  string secret_manager_stored_password = 9
+      [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Configuration for Oracle Automatic Storage Management (ASM) connection.
+message OracleAsmConfig {
+  // Required. Hostname for the Oracle ASM connection.
+  string hostname = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Port for the Oracle ASM connection.
+  int32 port = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Username for the Oracle ASM connection.
+  string username = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Password for the Oracle ASM connection. Mutually exclusive with
+  // the `secret_manager_stored_password` field.
+  string password = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Required. ASM service name for the Oracle ASM connection.
+  string asm_service = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Connection string attributes
+  map<string, string> connection_attributes = 6
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. SSL configuration for the Oracle connection.
+  OracleSslConfig oracle_ssl_config = 7
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A reference to a Secret Manager resource name storing the Oracle
+  // ASM connection password. Mutually exclusive with the `password` field.
+  string secret_manager_stored_password = 8
+      [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Profile for connecting to a MySQL source.
+message MysqlProfile {
+  // Required. Hostname for the MySQL connection.
+  string hostname = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Port for the MySQL connection, default value is 3306.
+  int32 port = 2;
+
+  // Required. Username for the MySQL connection.
+  string username = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Input only. Password for the MySQL connection. Mutually exclusive
+  // with the `secret_manager_stored_password` field.
+  string password = 4 [
+    (google.api.field_behavior) = OPTIONAL,
+    (google.api.field_behavior) = INPUT_ONLY
+  ];
+
+  // SSL configuration for the MySQL connection.
+  MysqlSslConfig ssl_config = 5;
+
+  // Optional. A reference to a Secret Manager resource name storing the MySQL
+  // connection password. Mutually exclusive with the `password` field.
+  string secret_manager_stored_password = 6
+      [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Profile for connecting to a PostgreSQL source.
+message PostgresqlProfile {
+  // Required. Hostname for the PostgreSQL connection.
+  string hostname = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Port for the PostgreSQL connection, default value is 5432.
+  int32 port = 2;
+
+  // Required. Username for the PostgreSQL connection.
+  string username = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Password for the PostgreSQL connection. Mutually exclusive with
+  // the `secret_manager_stored_password` field.
+  string password = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Required. Database for the PostgreSQL connection.
+  string database = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. A reference to a Secret Manager resource name storing the
+  // PostgreSQL connection password. Mutually exclusive with the `password`
+  // field.
+  string secret_manager_stored_password = 6
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. SSL configuration for the PostgreSQL connection.
+  // In case PostgresqlSslConfig is not set, the connection will use the default
+  // SSL mode, which is `prefer` (i.e. this mode will only use encryption if
+  // enabled from database side, otherwise will use unencrypted communication)
+  PostgresqlSslConfig ssl_config = 7 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Profile for connecting to a SQLServer source.
+message SqlServerProfile {
+  // Required. Hostname for the SQLServer connection.
+  string hostname = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Port for the SQLServer connection, default value is 1433.
+  int32 port = 2;
+
+  // Required. Username for the SQLServer connection.
+  string username = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Password for the SQLServer connection. Mutually exclusive with
+  // the `secret_manager_stored_password` field.
+  string password = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Required. Database for the SQLServer connection.
+  string database = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. SSL configuration for the SQLServer connection.
+  SqlServerSslConfig ssl_config = 6 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A reference to a Secret Manager resource name storing the
+  // SQLServer connection password. Mutually exclusive with the `password`
+  // field.
+  string secret_manager_stored_password = 7
+      [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Profile for connecting to a Salesforce source.
+message SalesforceProfile {
+  // Deprecated: Salesforce is retiring Username-Password authentication.
+  // Use `Oauth2ClientCredentials` instead.
+  message UserCredentials {
+    option deprecated = true;
+
+    // Required. Username for the Salesforce connection.
+    string username = 1 [(google.api.field_behavior) = REQUIRED];
+
+    // Optional. Password for the Salesforce connection.
+    // Mutually exclusive with the `secret_manager_stored_password` field.
+    string password = 2 [(google.api.field_behavior) = OPTIONAL];
+
+    // Optional. Security token for the Salesforce connection.
+    // Mutually exclusive with the `secret_manager_stored_security_token` field.
+    string security_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+    // Optional. A reference to a Secret Manager resource name storing the
+    // Salesforce connection's password. Mutually exclusive with the `password`
+    // field.
+    string secret_manager_stored_password = 4
+        [(google.api.field_behavior) = OPTIONAL];
+
+    // Optional. A reference to a Secret Manager resource name storing the
+    // Salesforce connection's security token. Mutually exclusive with the
+    // `security_token` field.
+    string secret_manager_stored_security_token = 5
+        [(google.api.field_behavior) = OPTIONAL];
+  }
+
+  // OAuth2 Client Credentials.
+  message Oauth2ClientCredentials {
+    // Required. Client ID for Salesforce OAuth2 Client Credentials.
+    string client_id = 1 [(google.api.field_behavior) = REQUIRED];
+
+    // Optional. Client secret for Salesforce OAuth2 Client Credentials.
+    // Mutually exclusive with the `secret_manager_stored_client_secret` field.
+    string client_secret = 2 [(google.api.field_behavior) = OPTIONAL];
+
+    // Optional. A reference to a Secret Manager resource name storing the
+    // Salesforce OAuth2 client_secret. Mutually exclusive with the
+    // `client_secret` field.
+    string secret_manager_stored_client_secret = 3
+        [(google.api.field_behavior) = OPTIONAL];
+  }
+
+  // Required. Domain endpoint for the Salesforce connection.
+  string domain = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Credentials for Salesforce connection.
+  oneof credentials {
+    // Deprecated: Salesforce is retiring Username-Password authentication.
+    // Use `oauth2_client_credentials` instead.
+    UserCredentials user_credentials = 2 [deprecated = true];
+
+    // Connected app authentication.
+    Oauth2ClientCredentials oauth2_client_credentials = 3;
+  }
+}
+
+// Profile for connecting to a MongoDB source.
+message MongodbProfile {
+  // Required. List of host addresses for a MongoDB cluster.
+  // For SRV connection format, this list must contain exactly one DNS host
+  // without a port. For Standard connection format, this list must contain all
+  // the required hosts in the cluster with their respective ports.
+  repeated HostAddress host_addresses = 1
+      [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Name of the replica set. Only needed for self hosted replica set
+  // type MongoDB cluster. For SRV connection format, this field must be empty.
+  // For Standard connection format, this field must be specified.
+  string replica_set = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Required. Username for the MongoDB connection.
+  string username = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Password for the MongoDB connection. Mutually exclusive with the
+  // `secret_manager_stored_password` field.
+  string password = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A reference to a Secret Manager resource name storing the
+  // SQLServer connection password. Mutually exclusive with the `password`
+  // field.
+  string secret_manager_stored_password = 5
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. SSL configuration for the MongoDB connection.
+  MongodbSslConfig ssl_config = 6 [(google.api.field_behavior) = OPTIONAL];
+
+  // MongoDB connection format.
+  // Must specify either srv_connection_format or standard_connection_format.
+  oneof mongodb_connection_format {
+    // Srv connection format.
+    SrvConnectionFormat srv_connection_format = 101;
+
+    // Standard connection format.
+    StandardConnectionFormat standard_connection_format = 102;
+  }
+
+  // Optional. Specifies additional options for the MongoDB connection.
+  //
+  // The options should be sent as key-value pairs, for example:
+  // `additional_options =
+  // {"serverSelectionTimeoutMS": "10000", "directConnection": "true"}`.
+  //
+  // Keys are case-sensitive and should match the official MongoDB connection
+  // string options:
+  // https://www.mongodb.com/docs/manual/reference/connection-string-options/
+  //
+  // The server will not modify the values provided by the user.
+  map<string, string> additional_options = 7
+      [(google.api.field_behavior) = OPTIONAL];
+}
+
+// A HostAddress represents a transport end point, which is the combination
+// of an IP address or hostname and a port number.
+message HostAddress {
+  // Required. Hostname for the connection.
+  string hostname = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Port for the connection.
+  int32 port = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Profile for connecting to a Spanner source.
+message SpannerProfile {
+  // Required. Immutable. Cloud Spanner database resource.
+  // This field is immutable.
+  // Must be in the format:
+  // projects/{project}/instances/{instance}/databases/{database_id}.
+  string database = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.field_behavior) = IMMUTABLE,
+    (google.api.resource_reference) = {
+      type: "spanner.googleapis.com/Database"
+    }
+  ];
+
+  // Optional. The Spanner endpoint to connect to. Defaults to the global
+  // endpoint (https://spanner.googleapis.com). Must be in the format:
+  // https://spanner.{region}.rep.googleapis.com.
+  string host = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// OAuth Client Credentials.
+message OauthClientCredentials {
+  // Required. Client ID for OAuth Client Credentials.
+  string client_id = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Client secret for OAuth Client Credentials.
+  Secret client_secret = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// OAuth Refresh Token Credentials.
+message OauthRefreshTokenCredentials {
+  // Required. Specifies the OAuth Client Credentials.
+  OauthClientCredentials oauth_client_credentials = 1
+      [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Specifies the OAuth Refresh Token.
+  Secret refresh_token = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// User-password credentials.
+message UserPasswordCredentials {
+  // Required. Username for the connection.
+  string username = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Password for the connection.
+  Secret password = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Profile for connecting to a Salesforce Marketing Cloud source.
+message SalesforceMarketingCloudProfile {
+  // Required. Subdomain for the Salesforce Marketing Cloud connection.
+  // Example: if your specific endpoint is
+  // `https://{your-specific-subdomain}.rest.marketingcloudapis.com/`,
+  // the subdomain is `{your-specific-subdomain}`.
+  // Must be 1-63 characters, start and end with an alphanumeric character,
+  // and contain only lowercase letters, numbers, and hyphens (-).
+  string subdomain = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Input only. Credentials for authenticating with the Salesforce
+  // Marketing Cloud API.
+  OauthClientCredentials oauth_client_credentials = 3 [
+    (google.api.field_behavior) = INPUT_ONLY,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// Profile for connecting to a Dataverse source.
+message DataverseProfile {
+  // Required. Tenant id of the Microsoft Dataverse instance.
+  string tenant_id = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Environment URL of the Microsoft Dataverse instance.
+  // Example:  `<subdomain>.crm.dynamics.com`
+  string environment_url = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Credentials for authenticating with the Dataverse API.
+  OauthClientCredentials oauth_client_credentials = 3
+      [(google.api.field_behavior) = REQUIRED];
+}
+
+// Profile for connecting to a ServiceNow source.
+message ServiceNowProfile {
+  // Required. The instance of the ServiceNow account. This is the `<instance>`
+  // part of the URL `https://<instance>.service-now.com`.
+  string instance = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Authentication credentials.
+  oneof credentials {
+    // User-password authentication.
+    UserPasswordCredentials user_password_credentials = 2;
+
+    // Credentials for authenticating with the ServiceNow API.
+    OauthClientCredentials oauth_client_credentials = 3;
+  }
+}
+
+// Profile for connecting to a Workday source.
+message WorkdayProfile {
+  // Required. Host for the Workday connection. Must be a valid hostname (e.g.,
+  // `wd3-impl-services1.workday.com`).
+  string host = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Tenant for the Workday connection (e.g., `google12`).
+  string tenant = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Credentials for authenticating with the Workday API.
+  // OAuth Refresh Token credentials for authenticating with the Workday API.
+  OauthRefreshTokenCredentials oauth_refresh_token_credentials = 3
+      [(google.api.field_behavior) = REQUIRED];
+}
+
+// Srv connection format.
+message SrvConnectionFormat {}
+
+// Standard connection format.
+message StandardConnectionFormat {
+  // Optional. Deprecated: Use the `additional_options` map to specify the
+  // `directConnection` parameter instead.
+  // For example: `additional_options = {"directConnection": "true"}`.
+  // Specifies whether the client connects directly to the host[:port] in the
+  // connection URI.
+  bool direct_connection = 1
+      [deprecated = true, (google.api.field_behavior) = OPTIONAL];
+}
+
+// Profile for connecting to a Cloud Storage destination.
+message GcsProfile {
+  // Required. The Cloud Storage bucket name.
+  string bucket = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. The root path inside the Cloud Storage bucket.
+  string root_path = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Profile for connecting to a BigQuery destination.
+message BigQueryProfile {}
+
+// Static IP address connectivity. Used when the source database is configured
+// to allow incoming connections from the Datastream public IP addresses
+// for the region specified in the connection profile.
+message StaticServiceIpConnectivity {}
+
+// Forward SSH Tunnel connectivity.
+message ForwardSshTunnelConnectivity {
+  // Required. Hostname for the SSH tunnel.
+  string hostname = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Username for the SSH tunnel.
+  string username = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Port for the SSH tunnel, default value is 22.
+  int32 port = 3;
+
+  // SSH authentication method.
+  oneof authentication_method {
+    // Input only. SSH password.
+    string password = 100 [(google.api.field_behavior) = INPUT_ONLY];
+
+    // Input only. SSH private key.
+    string private_key = 101 [(google.api.field_behavior) = INPUT_ONLY];
+  }
+}
+
+// The VPC Peering configuration is used to create VPC peering between
+// Datastream and the consumer's VPC.
+message VpcPeeringConfig {
+  // Required. Fully qualified name of the VPC that Datastream will peer to.
+  // Format: `projects/{project}/global/{networks}/{name}`
+  string vpc = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "compute.googleapis.com/Networks"
+    }
+  ];
+
+  // Required. A free subnet for peering. (CIDR of /29)
+  string subnet = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The PSC Interface configuration is used to create PSC Interface between
+// Datastream and the consumer's PSC.
+message PscInterfaceConfig {
+  // Required. Fully qualified name of the Network Attachment that Datastream
+  // will connect to. Format:
+  // `projects/{project}/regions/{region}/networkAttachments/{name}`
+  string network_attachment = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "compute.googleapis.com/NetworkAttachment"
+    }
+  ];
+}
+
+// The PrivateConnection resource is used to establish private connectivity
+// between Datastream and a customer's network.
+message PrivateConnection {
+  option (google.api.resource) = {
+    type: "datastream.googleapis.com/PrivateConnection"
+    pattern: "projects/{project}/locations/{location}/privateConnections/{private_connection}"
+  };
+
+  // Private Connection state.
+  enum State {
+    // Unspecified state.
+    STATE_UNSPECIFIED = 0;
+
+    // The private connection is in creation state - creating resources.
+    CREATING = 1;
+
+    // The private connection has been created with all of its resources.
+    CREATED = 2;
+
+    // The private connection creation has failed.
+    FAILED = 3;
+
+    // The private connection is being deleted.
+    DELETING = 4;
+
+    // Delete request has failed, resource is in invalid state.
+    FAILED_TO_DELETE = 5;
+  }
+
+  // Output only. Identifier. The resource's name.
+  string name = 1 [
+    (google.api.field_behavior) = IDENTIFIER,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Output only. The create time of the resource.
+  google.protobuf.Timestamp create_time = 2
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The update time of the resource.
+  google.protobuf.Timestamp update_time = 3
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Labels.
+  map<string, string> labels = 4;
+
+  // Required. Display name.
+  string display_name = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Output only. The state of the Private Connection.
+  State state = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. In case of error, the details of the error in a user-friendly
+  // format.
+  Error error = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Reserved for future use.
+  optional bool satisfies_pzs = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Reserved for future use.
+  optional bool satisfies_pzi = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // VPC Peering Config.
+  VpcPeeringConfig vpc_peering_config = 100;
+
+  // PSC Interface Config.
+  PscInterfaceConfig psc_interface_config = 101;
+}
+
+// Private Connectivity
+message PrivateConnectivity {
+  // Required. A reference to a private connection resource.
+  // Format: `projects/{project}/locations/{location}/privateConnections/{name}`
+  string private_connection = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "datastream.googleapis.com/PrivateConnection"
+    }
+  ];
+}
+
+// The route resource is the child of the private connection resource,
+// used for defining a route for a private connection.
+message Route {
+  option (google.api.resource) = {
+    type: "datastream.googleapis.com/Route"
+    pattern: "projects/{project}/locations/{location}/privateConnections/{private_connection}/routes/{route}"
+  };
+
+  // Output only. Identifier. The resource's name.
+  string name = 1 [
+    (google.api.field_behavior) = IDENTIFIER,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Output only. The create time of the resource.
+  google.protobuf.Timestamp create_time = 2
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The update time of the resource.
+  google.protobuf.Timestamp update_time = 3
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Labels.
+  map<string, string> labels = 4;
+
+  // Required. Display name.
+  string display_name = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Destination address for connection
+  string destination_address = 6 [(google.api.field_behavior) = REQUIRED];
+
+  // Destination port for connection
+  int32 destination_port = 7;
+}
+
+// A confidential piece of information where the actual value is either directly
+// specified in the message as a raw string or stored in GCP secret manager.
+message Secret {
+  // The actual value of the secret.
+  oneof value {
+    // Optional. Input only. The actual raw value of the secret as plain text.
+    string raw_value = 1 [
+      (google.api.field_behavior) = INPUT_ONLY,
+      (google.api.field_behavior) = OPTIONAL
+    ];
+
+    // Optional. A Secret Manager resource name storing the actual value of the
+    // secret. Supported formats:
+    //   * projects/{project}/locations/{location}/secrets/{secret}/versions/{version}
+    //   * projects/{project}/secrets/{secret}/versions/{version}
+    string secret_version = 2 [(google.api.field_behavior) = OPTIONAL];
+  }
+}
+
+// MongoDB SSL configuration information.
+message MongodbSslConfig {
+  // Optional. Input only. PEM-encoded private key associated with the Client
+  // Certificate. If this field is used then the 'client_certificate' and the
+  // 'ca_certificate' fields are mandatory.
+  string client_key = 1 [
+    (google.api.field_behavior) = INPUT_ONLY,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+
+  // Output only. Indicates whether the client_key field is set.
+  bool client_key_set = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Optional. Input only. PEM-encoded certificate that will be used by the
+  // replica to authenticate against the source database server. If this field
+  // is used then the 'client_key' and the 'ca_certificate' fields are
+  // mandatory.
+  string client_certificate = 3 [
+    (google.api.field_behavior) = INPUT_ONLY,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+
+  // Output only. Indicates whether the client_certificate field is set.
+  bool client_certificate_set = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Optional. Input only. PEM-encoded certificate of the CA that signed the
+  // source database server's certificate.
+  string ca_certificate = 5 [
+    (google.api.field_behavior) = INPUT_ONLY,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+
+  // Output only. Indicates whether the ca_certificate field is set.
+  bool ca_certificate_set = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Optional. Input only. A reference to a Secret Manager resource name storing
+  // the PEM-encoded private key associated with the Client Certificate. If this
+  // field is used then the 'client_certificate' and the 'ca_certificate' fields
+  // are mandatory. Mutually exclusive with the `client_key` field.
+  string secret_manager_stored_client_key = 7 [
+    (google.api.field_behavior) = INPUT_ONLY,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+}
+
+// MySQL SSL configuration information.
+message MysqlSslConfig {
+  // Optional. Input only. PEM-encoded private key associated with the Client
+  // Certificate. If this field is used then the 'client_certificate' and the
+  // 'ca_certificate' fields are mandatory.
+  string client_key = 1 [
+    (google.api.field_behavior) = INPUT_ONLY,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+
+  // Output only. Indicates whether the client_key field is set.
+  bool client_key_set = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Optional. Input only. PEM-encoded certificate that will be used by the
+  // replica to authenticate against the source database server. If this field
+  // is used then the 'client_key' and the 'ca_certificate' fields are
+  // mandatory.
+  string client_certificate = 3 [
+    (google.api.field_behavior) = INPUT_ONLY,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+
+  // Output only. Indicates whether the client_certificate field is set.
+  bool client_certificate_set = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Input only. PEM-encoded certificate of the CA that signed the source
+  // database server's certificate.
+  string ca_certificate = 5 [(google.api.field_behavior) = INPUT_ONLY];
+
+  // Output only. Indicates whether the ca_certificate field is set.
+  bool ca_certificate_set = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// Oracle SSL configuration information.
+message OracleSslConfig {
+  // Input only. PEM-encoded certificate of the CA that signed the source
+  // database server's certificate.
+  string ca_certificate = 1 [(google.api.field_behavior) = INPUT_ONLY];
+
+  // Output only. Indicates whether the ca_certificate field has been set for
+  // this Connection-Profile.
+  bool ca_certificate_set = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Optional. The distinguished name (DN) mentioned in the server
+  // certificate. This corresponds to SSL_SERVER_CERT_DN sqlnet parameter.
+  // Refer
+  // https://docs.oracle.com/en/database/oracle/oracle-database/19/netrf/local-naming-parameters-in-tns-ora-file.html#GUID-70AB0695-A9AA-4A94-B141-4C605236EEB7
+  // If this field is not provided, the DN matching is not enforced.
+  string server_certificate_distinguished_name = 3
+      [(google.api.field_behavior) = OPTIONAL];
+}
+
+// SQL Server SSL configuration information.
+message SqlServerSslConfig {
+  // Message to represent the option where encryption is not enforced. An empty
+  // message right now to allow future extensibility.
+  message EncryptionNotEnforced {}
+
+  // Message to represent the option where Datastream will enforce encryption
+  // without authenticating server identity. Server certificates will be trusted
+  // by default.
+  message BasicEncryption {}
+
+  // Message to represent the option where Datastream will enforce encryption
+  // and authenticate server identity. ca_certificate must be set if user
+  // selects this option.
+  message EncryptionAndServerValidation {
+    // Optional. Input only. PEM-encoded certificate of the CA that signed the
+    // source database server's certificate.
+    string ca_certificate = 2 [
+      (google.api.field_behavior) = INPUT_ONLY,
+      (google.api.field_behavior) = OPTIONAL
+    ];
+
+    // Optional. The hostname mentioned in the Subject or SAN extension of the
+    // server certificate. This field is used for bypassing the hostname
+    // validation while verifying server certificate. This is required for
+    // scenarios where the host name that datastream connects to is different
+    // from the certificate's subject. This specifically happens for private
+    // connectivity. It could also happen when the customer provides
+    // a public IP in connection profile but the same is not present in the
+    // server certificate.
+    optional string server_certificate_hostname = 3
+        [(google.api.field_behavior) = OPTIONAL];
+  }
+
+  // The encryption settings available for SQL Server connection profiles.
+  // This captures various options like no TLS encryption from client if server
+  // doesn't ask for it, only encryption without validation and both encryption
+  // as well as validation of server certificate.
+  oneof encryption_setting {
+    // If set, Datastream will not enforce encryption. If the DB server mandates
+    // encryption, then connection will be encrypted but server identity will
+    // not be authenticated.
+    EncryptionNotEnforced encryption_not_enforced = 1;
+
+    // If set, Datastream will enforce encryption without authenticating server
+    // identity. Server certificates will be trusted by default.
+    BasicEncryption basic_encryption = 2;
+
+    // If set, Datastream will enforce encryption and authenticate server
+    // identity.
+    EncryptionAndServerValidation encryption_and_server_validation = 3;
+  }
+}
+
+// PostgreSQL SSL configuration information.
+message PostgresqlSslConfig {
+  // Message represents the option where Datastream will enforce the encryption
+  // and authenticate the server identity. ca_certificate must be set if user
+  // selects this option.
+  message ServerVerification {
+    // Required. Input only. PEM-encoded server root CA certificate.
+    string ca_certificate = 1 [
+      (google.api.field_behavior) = INPUT_ONLY,
+      (google.api.field_behavior) = REQUIRED
+    ];
+
+    // Optional. The hostname mentioned in the Subject or SAN extension of the
+    // server certificate. If this field is not provided, the hostname in the
+    // server certificate is not validated.
+    string server_certificate_hostname = 2
+        [(google.api.field_behavior) = OPTIONAL];
+  }
+
+  // Message represents the option where Datastream will enforce the encryption
+  // and authenticate the server identity as well as the client identity.
+  // ca_certificate, client_certificate and client_key must be set if user
+  // selects this option.
+  message ServerAndClientVerification {
+    // Required. Input only. PEM-encoded certificate used by the source database
+    // to authenticate the client identity (i.e., the Datastream's identity).
+    // This certificate is signed by either a root certificate trusted by the
+    // server or one or more intermediate certificates (which is stored with the
+    // leaf certificate) to link the this certificate to the trusted root
+    // certificate.
+    string client_certificate = 1 [
+      (google.api.field_behavior) = INPUT_ONLY,
+      (google.api.field_behavior) = REQUIRED
+    ];
+
+    // Optional. Input only. PEM-encoded private key associated with the client
+    // certificate. This value will be used during the SSL/TLS handshake,
+    // allowing the PostgreSQL server to authenticate the client's identity,
+    // i.e. identity of the Datastream.
+    string client_key = 2 [
+      (google.api.field_behavior) = INPUT_ONLY,
+      (google.api.field_behavior) = OPTIONAL
+    ];
+
+    // Required. Input only. PEM-encoded server root CA certificate.
+    string ca_certificate = 3 [
+      (google.api.field_behavior) = INPUT_ONLY,
+      (google.api.field_behavior) = REQUIRED
+    ];
+
+    // Optional. The hostname mentioned in the Subject or SAN extension of the
+    // server certificate. If this field is not provided, the hostname in the
+    // server certificate is not validated.
+    string server_certificate_hostname = 5
+        [(google.api.field_behavior) = OPTIONAL];
+  }
+
+  // The encryption settings available for PostgreSQL connection profiles.
+  // This captures various SSL mode supported by PostgreSQL, which includes
+  // TLS encryption with server verification, TLS encryption with both server
+  // and client verification and no TLS encryption.
+  oneof encryption_setting {
+    //  If this field is set, the communication will be encrypted with TLS
+    //  encryption and the server identity will be authenticated.
+    ServerVerification server_verification = 1;
+
+    // If this field is set, the communication will be encrypted with TLS
+    // encryption and both the server identity and the client identity will be
+    // authenticated.
+    ServerAndClientVerification server_and_client_verification = 2;
+  }
+}
+
+// A set of reusable connection configurations to be used as a source or
+// destination for a stream.
+message ConnectionProfile {
+  option (google.api.resource) = {
+    type: "datastream.googleapis.com/ConnectionProfile"
+    pattern: "projects/{project}/locations/{location}/connectionProfiles/{connection_profile}"
+  };
+
+  // Output only. Identifier. The resource's name.
+  string name = 1 [
+    (google.api.field_behavior) = IDENTIFIER,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Output only. The create time of the resource.
+  google.protobuf.Timestamp create_time = 2
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The update time of the resource.
+  google.protobuf.Timestamp update_time = 3
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Labels.
+  map<string, string> labels = 4;
+
+  // Required. Display name.
+  string display_name = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Output only. Reserved for future use.
+  optional bool satisfies_pzs = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Reserved for future use.
+  optional bool satisfies_pzi = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Connection configuration for the ConnectionProfile.
+  oneof profile {
+    // Profile for connecting to an Oracle source.
+    OracleProfile oracle_profile = 100;
+
+    // Profile for connecting to a Cloud Storage destination.
+    GcsProfile gcs_profile = 101;
+
+    // Profile for connecting to a MySQL source.
+    MysqlProfile mysql_profile = 102;
+
+    // Profile for connecting to a BigQuery destination.
+    BigQueryProfile bigquery_profile = 103;
+
+    // Profile for connecting to a PostgreSQL source.
+    PostgresqlProfile postgresql_profile = 104;
+
+    // Profile for connecting to a SQLServer source.
+    SqlServerProfile sql_server_profile = 105;
+
+    // Profile for connecting to a Salesforce source.
+    SalesforceProfile salesforce_profile = 107;
+
+    // Profile for connecting to a MongoDB source.
+    MongodbProfile mongodb_profile = 108;
+
+    // Profile for connecting to a Spanner source.
+    SpannerProfile spanner_profile = 109;
+
+    // Profile for connecting to a Dataverse source.
+    DataverseProfile dataverse_profile = 114;
+
+    // Profile for connecting to a Salesforce Marketing Cloud source.
+    SalesforceMarketingCloudProfile salesforce_marketing_cloud_profile = 119;
+
+    // Profile for connecting to a ServiceNow source.
+    ServiceNowProfile service_now_profile = 120;
+
+    // Optional. Profile for connecting to a Workday source.
+    WorkdayProfile workday_profile = 121
+        [(google.api.field_behavior) = OPTIONAL];
+  }
+
+  // Connectivity options used to establish a connection to the profile.
+  oneof connectivity {
+    // Static Service IP connectivity.
+    StaticServiceIpConnectivity static_service_ip_connectivity = 200;
+
+    // Forward SSH tunnel connectivity.
+    ForwardSshTunnelConnectivity forward_ssh_connectivity = 201;
+
+    // Private connectivity.
+    PrivateConnectivity private_connectivity = 202;
+  }
+}
+
+// Oracle Column.
+message OracleColumn {
+  // The column name.
+  string column = 1;
+
+  // The Oracle data type.
+  string data_type = 2;
+
+  // Column length.
+  int32 length = 3;
+
+  // Column precision.
+  int32 precision = 4;
+
+  // Column scale.
+  int32 scale = 5;
+
+  // Column encoding.
+  string encoding = 6;
+
+  // Whether or not the column represents a primary key.
+  bool primary_key = 7;
+
+  // Whether or not the column can accept a null value.
+  bool nullable = 8;
+
+  // The ordinal position of the column in the table.
+  int32 ordinal_position = 9;
+}
+
+// Oracle table.
+message OracleTable {
+  // The table name.
+  string table = 1;
+
+  // Oracle columns in the schema.
+  // When unspecified as part of include/exclude objects, includes/excludes
+  // everything.
+  repeated OracleColumn oracle_columns = 2;
+}
+
+// Oracle schema.
+message OracleSchema {
+  // The schema name.
+  string schema = 1;
+
+  // Tables in the schema.
+  repeated OracleTable oracle_tables = 2;
+}
+
+// Oracle database structure.
+message OracleRdbms {
+  // Oracle schemas/databases in the database server.
+  repeated OracleSchema oracle_schemas = 1;
+}
+
+// Configuration for syncing data from an Oracle source.
+message OracleSourceConfig {
+  // Configuration to drop large object values.
+  message DropLargeObjects {}
+
+  // Configuration to stream large object values.
+  message StreamLargeObjects {}
+
+  // Configuration to use LogMiner CDC method.
+  message LogMiner {}
+
+  // Configuration to use Binary Log Parser CDC technique.
+  message BinaryLogParser {
+    // Configuration to use Oracle ASM to access the log files.
+    message OracleAsmLogFileAccess {}
+
+    // Configuration to specify the Oracle directories to access the log files.
+    message LogFileDirectories {
+      // Required. Oracle directory for online logs.
+      string online_log_directory = 1 [(google.api.field_behavior) = REQUIRED];
+
+      // Required. Oracle directory for archived logs.
+      string archived_log_directory = 2
+          [(google.api.field_behavior) = REQUIRED];
+    }
+
+    // Configuration to specify how the log file should be accessed.
+    oneof log_file_access {
+      // Use Oracle ASM.
+      OracleAsmLogFileAccess oracle_asm_log_file_access = 1;
+
+      // Use Oracle directories.
+      LogFileDirectories log_file_directories = 2;
+    }
+  }
+
+  // The Oracle objects to include in the stream.
+  OracleRdbms include_objects = 1;
+
+  // The Oracle objects to exclude from the stream.
+  OracleRdbms exclude_objects = 2;
+
+  // Maximum number of concurrent CDC tasks. The number should be non-negative.
+  // If not set (or set to 0), the system's default value is used.
+  int32 max_concurrent_cdc_tasks = 3;
+
+  // Maximum number of concurrent backfill tasks. The number should be
+  // non-negative. If not set (or set to 0), the system's default value is used.
+  int32 max_concurrent_backfill_tasks = 4;
+
+  // The configuration for handle Oracle large objects.
+  oneof large_objects_handling {
+    // Drop large object values.
+    DropLargeObjects drop_large_objects = 100;
+
+    // Stream large object values.
+    StreamLargeObjects stream_large_objects = 102;
+  }
+
+  // Configuration to select the CDC method.
+  oneof cdc_method {
+    // Use LogMiner.
+    LogMiner log_miner = 103;
+
+    // Use Binary Log Parser.
+    BinaryLogParser binary_log_parser = 104;
+  }
+}
+
+// PostgreSQL Column.
+message PostgresqlColumn {
+  // The column name.
+  string column = 1;
+
+  // The PostgreSQL data type.
+  string data_type = 2;
+
+  // Column length.
+  int32 length = 3;
+
+  // Column precision.
+  int32 precision = 4;
+
+  // Column scale.
+  int32 scale = 5;
+
+  // Whether or not the column represents a primary key.
+  bool primary_key = 7;
+
+  // Whether or not the column can accept a null value.
+  bool nullable = 8;
+
+  // The ordinal position of the column in the table.
+  int32 ordinal_position = 9;
+}
+
+// PostgreSQL table.
+message PostgresqlTable {
+  // The table name.
+  string table = 1;
+
+  // PostgreSQL columns in the schema.
+  // When unspecified as part of include/exclude objects,
+  // includes/excludes everything.
+  repeated PostgresqlColumn postgresql_columns = 2;
+}
+
+// PostgreSQL schema.
+message PostgresqlSchema {
+  // The schema name.
+  string schema = 1;
+
+  // Tables in the schema.
+  repeated PostgresqlTable postgresql_tables = 2;
+}
+
+// PostgreSQL database structure.
+message PostgresqlRdbms {
+  // PostgreSQL schemas in the database server.
+  repeated PostgresqlSchema postgresql_schemas = 1;
+}
+
+// Configuration for syncing data from a PostgreSQL source.
+message PostgresqlSourceConfig {
+  // The PostgreSQL objects to include in the stream.
+  PostgresqlRdbms include_objects = 1;
+
+  // The PostgreSQL objects to exclude from the stream.
+  PostgresqlRdbms exclude_objects = 2;
+
+  // Required. Immutable. The name of the logical replication slot that's
+  // configured with the pgoutput plugin.
+  string replication_slot = 3 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.field_behavior) = IMMUTABLE
+  ];
+
+  // Required. The name of the publication that includes the set of all tables
+  // that are defined in the stream's include_objects.
+  string publication = 4 [(google.api.field_behavior) = REQUIRED];
+
+  // Maximum number of concurrent backfill tasks. The number should be non
+  // negative. If not set (or set to 0), the system's default value will be
+  // used.
+  int32 max_concurrent_backfill_tasks = 5;
+}
+
+// SQLServer Column.
+message SqlServerColumn {
+  // The column name.
+  string column = 1;
+
+  // The SQLServer data type.
+  string data_type = 2;
+
+  // Column length.
+  int32 length = 3;
+
+  // Column precision.
+  int32 precision = 4;
+
+  // Column scale.
+  int32 scale = 5;
+
+  // Whether or not the column represents a primary key.
+  bool primary_key = 6;
+
+  // Whether or not the column can accept a null value.
+  bool nullable = 7;
+
+  // The ordinal position of the column in the table.
+  int32 ordinal_position = 8;
+}
+
+// SQLServer table.
+message SqlServerTable {
+  // The table name.
+  string table = 1;
+
+  // SQLServer columns in the schema.
+  // When unspecified as part of include/exclude objects,
+  // includes/excludes everything.
+  repeated SqlServerColumn columns = 2;
+}
+
+// SQLServer schema.
+message SqlServerSchema {
+  // The schema name.
+  string schema = 1;
+
+  // Tables in the schema.
+  repeated SqlServerTable tables = 2;
+}
+
+// SQLServer database structure.
+message SqlServerRdbms {
+  // SQLServer schemas in the database server.
+  repeated SqlServerSchema schemas = 1;
+}
+
+// Configuration for syncing data from a SQLServer source.
+message SqlServerSourceConfig {
+  // The SQLServer objects to include in the stream.
+  SqlServerRdbms include_objects = 1;
+
+  // The SQLServer objects to exclude from the stream.
+  SqlServerRdbms exclude_objects = 2;
+
+  // Max concurrent CDC tasks.
+  int32 max_concurrent_cdc_tasks = 3;
+
+  // Max concurrent backfill tasks.
+  int32 max_concurrent_backfill_tasks = 4;
+
+  // Configuration to select the CDC read method for the stream.
+  oneof cdc_method {
+    // CDC reader reads from transaction logs.
+    SqlServerTransactionLogs transaction_logs = 101;
+
+    // CDC reader reads from change tables.
+    SqlServerChangeTables change_tables = 102;
+  }
+}
+
+// Configuration to use Transaction Logs CDC read method.
+message SqlServerTransactionLogs {}
+
+// Configuration to use Change Tables CDC read method.
+message SqlServerChangeTables {
+  // DDL configuration for change tables.
+  message SqlServerDdlConfig {
+    // Optional. If set to true, Datastream will automatically create a new
+    // capture instance when DDL is detected on a table.The customer will be
+    // responsible for deleting it so that the next set of DDLs can be handled.
+    // The default is false and it means that DDL's will not be handled .
+    bool auto_create_new_capture_instance_on_ddl = 1
+        [(google.api.field_behavior) = OPTIONAL];
+
+    // Optional. If set to true, Datastream will automatically delete the old
+    // capture instance after creating a new one to support a DDL change. The
+    // default is false and means that the customer has to delete the old
+    // capture instance manually.
+    bool auto_delete_old_capture_instance = 2
+        [(google.api.field_behavior) = OPTIONAL];
+  }
+
+  // Optional. DDL configuration for change tables.
+  SqlServerDdlConfig ddl_config = 1 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// MySQL Column.
+message MysqlColumn {
+  // The column name.
+  string column = 1;
+
+  // The MySQL data type. Full data types list can be found here:
+  // https://dev.mysql.com/doc/refman/8.0/en/data-types.html
+  string data_type = 2;
+
+  // Column length.
+  int32 length = 3;
+
+  // Column collation.
+  string collation = 4;
+
+  // Whether or not the column represents a primary key.
+  bool primary_key = 5;
+
+  // Whether or not the column can accept a null value.
+  bool nullable = 6;
+
+  // The ordinal position of the column in the table.
+  int32 ordinal_position = 7;
+
+  // Column precision.
+  int32 precision = 8;
+
+  // Column scale.
+  int32 scale = 9;
+}
+
+// MySQL table.
+message MysqlTable {
+  // The table name.
+  string table = 1;
+
+  // MySQL columns in the database.
+  // When unspecified as part of include/exclude objects, includes/excludes
+  // everything.
+  repeated MysqlColumn mysql_columns = 2;
+}
+
+// MySQL database.
+message MysqlDatabase {
+  // The database name.
+  string database = 1;
+
+  // Tables in the database.
+  repeated MysqlTable mysql_tables = 2;
+}
+
+// MySQL database structure
+message MysqlRdbms {
+  // Mysql databases on the server
+  repeated MysqlDatabase mysql_databases = 1;
+}
+
+// Configuration for syncing data from a MySQL source.
+message MysqlSourceConfig {
+  // Use Binary log position based replication.
+  message BinaryLogPosition {}
+
+  // Use GTID based replication.
+  message Gtid {}
+
+  // The MySQL objects to retrieve from the source.
+  MysqlRdbms include_objects = 1;
+
+  // The MySQL objects to exclude from the stream.
+  MysqlRdbms exclude_objects = 2;
+
+  // Maximum number of concurrent CDC tasks. The number should be non negative.
+  // If not set (or set to 0), the system's default value will be used.
+  int32 max_concurrent_cdc_tasks = 3;
+
+  // Maximum number of concurrent backfill tasks. The number should be non
+  // negative. If not set (or set to 0), the system's default value will be
+  // used.
+  int32 max_concurrent_backfill_tasks = 4;
+
+  // The CDC method to use for the stream.
+  oneof cdc_method {
+    // Use Binary log position based replication.
+    BinaryLogPosition binary_log_position = 101;
+
+    // Use GTID based replication.
+    Gtid gtid = 102;
+  }
+}
+
+// Configuration for syncing data from a Salesforce source.
+message SalesforceSourceConfig {
+  // The Salesforce objects to retrieve from the source.
+  SalesforceOrg include_objects = 1;
+
+  // The Salesforce objects to exclude from the stream.
+  SalesforceOrg exclude_objects = 2;
+
+  // Required. Salesforce objects polling interval. The interval at which new
+  // changes will be polled for each object. The duration must be from `5
+  // minutes` to `24 hours`, inclusive.
+  google.protobuf.Duration polling_interval = 3
+      [(google.api.field_behavior) = REQUIRED];
+}
+
+// Salesforce organization structure.
+message SalesforceOrg {
+  // Salesforce objects in the database server.
+  repeated SalesforceObject objects = 1;
+}
+
+// Salesforce object.
+message SalesforceObject {
+  // The object name.
+  string object_name = 1;
+
+  // Salesforce fields.
+  // When unspecified as part of include objects,
+  // includes everything, when unspecified as part of exclude objects,
+  // excludes nothing.
+  repeated SalesforceField fields = 2;
+}
+
+// Salesforce field.
+message SalesforceField {
+  // The field name.
+  string name = 1;
+
+  // The data type.
+  string data_type = 2;
+
+  // Indicates whether the field can accept nil values.
+  bool nillable = 3;
+}
+
+// Configuration for syncing data from a MongoDB source.
+message MongodbSourceConfig {
+  // The MongoDB collections to include in the stream.
+  MongodbCluster include_objects = 1;
+
+  // The MongoDB collections to exclude from the stream.
+  MongodbCluster exclude_objects = 2;
+
+  // Optional. Maximum number of concurrent backfill tasks. The number should be
+  // non-negative and less than or equal to 50. If not set (or set to 0), the
+  // system's default value is used
+  int32 max_concurrent_backfill_tasks = 3
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. MongoDB JSON mode to use for the stream.
+  MongodbJsonMode json_mode = 4 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// MongoDB JSON mode.
+enum MongodbJsonMode {
+  // Unspecified JSON mode.
+  MONGODB_JSON_MODE_UNSPECIFIED = 0;
+
+  // Strict JSON mode.
+  STRICT = 1;
+
+  // Canonical JSON mode.
+  CANONICAL = 2;
+}
+
+// MongoDB Cluster structure.
+message MongodbCluster {
+  // MongoDB databases in the cluster.
+  repeated MongodbDatabase databases = 1;
+}
+
+// MongoDB Database.
+message MongodbDatabase {
+  // The database name.
+  string database = 1;
+
+  // Collections in the database.
+  repeated MongodbCollection collections = 2;
+}
+
+// MongoDB Collection.
+message MongodbCollection {
+  // The collection name.
+  string collection = 1;
+
+  // Fields in the collection.
+  repeated MongodbField fields = 2;
+}
+
+// MongoDB Field.
+message MongodbField {
+  // The field name.
+  string field = 1;
+}
+
+// Configuration for syncing data from a Spanner source.
+message SpannerSourceConfig {
+  // The RPC priority to use for the stream.
+  enum SpannerRpcPriority {
+    // Unspecified RPC priority.
+    SPANNER_RPC_PRIORITY_UNSPECIFIED = 0;
+
+    // Low RPC priority.
+    LOW = 1;
+
+    // Medium RPC priority.
+    MEDIUM = 2;
+
+    // High RPC priority.
+    HIGH = 3;
+  }
+
+  // Required. Immutable. The change stream name to use for the stream.
+  string change_stream_name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.field_behavior) = IMMUTABLE
+  ];
+
+  // Optional. The RPC priority to use for the stream.
+  SpannerRpcPriority spanner_rpc_priority = 2
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The FGAC role to use for the stream.
+  string fgac_role = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Maximum number of concurrent CDC tasks.
+  int32 max_concurrent_cdc_tasks = 8 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Maximum number of concurrent backfill tasks.
+  int32 max_concurrent_backfill_tasks = 4
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The Spanner objects to retrieve from the data source. If some
+  // objects are both included and excluded, an error will be thrown.
+  SpannerDatabase include_objects = 6 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The Spanner objects to avoid retrieving. If some objects are both
+  // included and excluded, an error will be thrown.
+  SpannerDatabase exclude_objects = 7 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Whether to use Data Boost for Spanner backfills. Defaults to
+  // false if not set.
+  bool backfill_data_boost_enabled = 9 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Spanner database structure.
+message SpannerDatabase {
+  // Optional. Spanner schemas in the database.
+  repeated SpannerSchema schemas = 1 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Spanner schema.
+message SpannerSchema {
+  // Required. The schema name.
+  string schema = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Spanner tables in the schema.
+  repeated SpannerTable tables = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Spanner table.
+message SpannerTable {
+  // Required. The table name.
+  string table = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Spanner columns in the table.
+  repeated SpannerColumn columns = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Spanner column.
+message SpannerColumn {
+  // Required. The column name.
+  string column = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Spanner data type.
+  string data_type = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Whether or not the column is a primary key.
+  bool is_primary_key = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The ordinal position of the column in the table.
+  int64 ordinal_position = 4 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Configuration for syncing data from a Dataverse source.
+message DataverseSourceConfig {
+  // Optional. The objects to retrieve from the source.
+  SourceCatalog include_objects = 1 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The objects to exclude from the stream.
+  SourceCatalog exclude_objects = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Required. Incremental sync polling interval for all objects. If not set, a
+  // default value of `5 minutes` is used. The duration must be from `5 minutes`
+  // to `24 hours`, inclusive.
+  google.protobuf.Duration polling_interval = 3
+      [(google.api.field_behavior) = REQUIRED];
+}
+
+// Configuration for syncing data from a Salesforce Marketing Cloud source.
+message SalesforceMarketingCloudSourceConfig {
+  // Optional. The objects to retrieve from the source.
+  SourceCatalog include_objects = 1 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The objects to exclude from the stream.
+  SourceCatalog exclude_objects = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Required. Incremental sync polling interval for all objects. If not set, a
+  // default value of `5 minutes` is used. The duration must be from `5 minutes`
+  // to `24 hours`, inclusive.
+  google.protobuf.Duration polling_interval = 3
+      [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Specifies the polling interval for a full refresh of objects that
+  // do not support incremental sync. If not set, a default value of 24 hours is
+  // used. The duration must be between 1 and 24 hours, inclusive.
+  google.protobuf.Duration full_refresh_polling_interval = 4
+      [(google.api.field_behavior) = REQUIRED];
+}
+
+// Configuration for syncing data from a ServiceNow source.
+message ServiceNowSourceConfig {
+  // Optional. The objects to retrieve from the source.
+  SourceCatalog include_objects = 1 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The objects to exclude from the stream.
+  SourceCatalog exclude_objects = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Required. Incremental sync polling interval for all objects. If not set, a
+  // default value of `5 minutes` is used. The duration must be from `5 minutes`
+  // to `24 hours`, inclusive.
+  google.protobuf.Duration polling_interval = 3
+      [(google.api.field_behavior) = REQUIRED];
+}
+
+// Configuration for syncing data from a Workday source.
+message WorkdaySourceConfig {
+  // Optional. The objects to retrieve from the source.
+  SourceCatalog include_objects = 1 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The objects to exclude from the stream.
+  SourceCatalog exclude_objects = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Required. Incremental sync polling interval for all objects. If not set, a
+  // default value of `5 minutes` is used. The duration must be from `5 minutes`
+  // to `24 hours`, inclusive.
+  google.protobuf.Duration polling_interval = 3
+      [(google.api.field_behavior) = REQUIRED];
+}
+
+// Source catalog.
+message SourceCatalog {
+  // Optional. Source objects in the catalog.
+  repeated SourceObject objects = 1 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Source object.
+message SourceObject {
+  // Required. The object name.
+  string object_name = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Source properties. When unspecified as part of include objects,
+  // includes everything, when unspecified as part of exclude objects, excludes
+  // nothing.
+  repeated SourceProperty properties = 2
+      [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Source property.
+message SourceProperty {
+  // Required. The property name.
+  string property_name = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Source properties. When specified, it means that the current
+  // property contains nested properties of its own. When unspecified as part of
+  // include objects, includes everything, when unspecified as part of exclude
+  // objects, excludes nothing.
+  repeated SourceProperty properties = 2
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Whether or not the property is a primary key.
+  bool primary_key = 4 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// The configuration of the stream source.
+message SourceConfig {
+  // Required. Source connection profile resource.
+  // Format: `projects/{project}/locations/{location}/connectionProfiles/{name}`
+  string source_connection_profile = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "datastream.googleapis.com/ConnectionProfile"
+    }
+  ];
+
+  // Stream configuration that is specific to the data source type.
+  oneof source_stream_config {
+    // Oracle data source configuration.
+    OracleSourceConfig oracle_source_config = 100;
+
+    // MySQL data source configuration.
+    MysqlSourceConfig mysql_source_config = 101;
+
+    // PostgreSQL data source configuration.
+    PostgresqlSourceConfig postgresql_source_config = 102;
+
+    // SQLServer data source configuration.
+    SqlServerSourceConfig sql_server_source_config = 103;
+
+    // Salesforce data source configuration.
+    SalesforceSourceConfig salesforce_source_config = 104;
+
+    // MongoDB data source configuration.
+    MongodbSourceConfig mongodb_source_config = 105;
+
+    // Spanner data source configuration.
+    SpannerSourceConfig spanner_source_config = 106;
+
+    // Dataverse data source configuration.
+    DataverseSourceConfig dataverse_source_config = 111;
+
+    // Salesforce Marketing Cloud data source configuration.
+    SalesforceMarketingCloudSourceConfig
+        salesforce_marketing_cloud_source_config = 116;
+
+    // ServiceNow data source configuration.
+    ServiceNowSourceConfig service_now_source_config = 117;
+
+    // Optional. Workday data source configuration.
+    WorkdaySourceConfig workday_source_config = 118
+        [(google.api.field_behavior) = OPTIONAL];
+  }
+}
+
+// AVRO file format configuration.
+message AvroFileFormat {}
+
+// JSON file format configuration.
+message JsonFileFormat {
+  // Schema file format.
+  enum SchemaFileFormat {
+    // Unspecified schema file format.
+    SCHEMA_FILE_FORMAT_UNSPECIFIED = 0;
+
+    // Do not attach schema file.
+    NO_SCHEMA_FILE = 1;
+
+    // Avro schema format.
+    AVRO_SCHEMA_FILE = 2;
+  }
+
+  // Json file compression.
+  enum JsonCompression {
+    // Unspecified json file compression.
+    JSON_COMPRESSION_UNSPECIFIED = 0;
+
+    // Do not compress JSON file.
+    NO_COMPRESSION = 1;
+
+    // Gzip compression.
+    GZIP = 2;
+  }
+
+  // The schema file format along JSON data files.
+  SchemaFileFormat schema_file_format = 1;
+
+  // Compression of the loaded JSON file.
+  JsonCompression compression = 2;
+}
+
+// BigQuery clustering configuration.
+message BigQueryClustering {
+  // Required. Column names to set as clustering columns.
+  repeated string columns = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Partitioning granularity for time partitions.
+enum PartitioningTimeGranularity {
+  // Unspecified partitioing interval.
+  PARTITIONING_TIME_GRANULARITY_UNSPECIFIED = 0;
+
+  // Hourly partitioning.
+  PARTITIONING_TIME_GRANULARITY_HOUR = 1;
+
+  // Daily partitioning.
+  PARTITIONING_TIME_GRANULARITY_DAY = 2;
+
+  // Monthly partitioning.
+  PARTITIONING_TIME_GRANULARITY_MONTH = 3;
+
+  // Yearly partitioning.
+  PARTITIONING_TIME_GRANULARITY_YEAR = 4;
+}
+
+// Ingestion time partitioning. see
+// https://cloud.google.com/bigquery/docs/partitioned-tables#ingestion_time
+message IngestionTimePartition {
+  // Optional. Partition granularity
+  PartitioningTimeGranularity partitioning_time_granularity = 1
+      [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Time unit column partitioning. see
+// https://cloud.google.com/bigquery/docs/partitioned-tables#date_timestamp_partitioned_tables
+message TimeUnitPartition {
+  // Required. The partitioning column.
+  string column = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Partition granularity.
+  PartitioningTimeGranularity partitioning_time_granularity = 2
+      [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Integer range partitioning. see
+// https://cloud.google.com/bigquery/docs/partitioned-tables#integer_range
+message IntegerRangePartition {
+  // Required. The partitioning column.
+  string column = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The starting value for range partitioning (inclusive).
+  int64 start = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The ending value for range partitioning (exclusive).
+  int64 end = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The interval of each range within the partition.
+  int64 interval = 4 [(google.api.field_behavior) = REQUIRED];
+}
+
+// BigQuery partitioning configuration.
+message BigQueryPartitioning {
+  // Partitioning to apply on the table.
+  oneof partitioning {
+    // Integer range partitioning.
+    IntegerRangePartition integer_range_partition = 100;
+
+    // Time unit column partitioning.
+    TimeUnitPartition time_unit_partition = 101;
+
+    // Ingestion time partitioning.
+    IngestionTimePartition ingestion_time_partition = 102;
+  }
+
+  // Optional. If true, queries over the table require a partition filter.
+  bool require_partition_filter = 103 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Google Cloud Storage destination configuration
+message GcsDestinationConfig {
+  // Path inside the Cloud Storage bucket to write data to.
+  string path = 1;
+
+  // The maximum file size to be saved in the bucket.
+  int32 file_rotation_mb = 2;
+
+  // The maximum duration for which new events are added before a file is
+  // closed and a new file is created. Values within the range of 15-60 seconds
+  // are allowed.
+  google.protobuf.Duration file_rotation_interval = 3;
+
+  // File Format that the data should be written in.
+  oneof file_format {
+    // AVRO file format configuration.
+    AvroFileFormat avro_file_format = 100;
+
+    // JSON file format configuration.
+    JsonFileFormat json_file_format = 101;
+  }
+}
+
+// BigQuery destination configuration
+message BigQueryDestinationConfig {
+  // A single target dataset to which all data will be streamed.
+  message SingleTargetDataset {
+    // The dataset ID of the target dataset.
+    // DatasetIds allowed characters:
+    // https://cloud.google.com/bigquery/docs/reference/rest/v2/datasets#datasetreference.
+    string dataset_id = 1;
+  }
+
+  // Destination datasets are created so that hierarchy of the destination data
+  // objects matches the source hierarchy.
+  message SourceHierarchyDatasets {
+    // Dataset template used for dynamic dataset creation.
+    message DatasetTemplate {
+      // Required. The geographic location where the dataset should reside. See
+      // https://cloud.google.com/bigquery/docs/locations for supported
+      // locations.
+      string location = 1 [(google.api.field_behavior) = REQUIRED];
+
+      // If supplied, every created dataset will have its name prefixed by the
+      // provided value. The prefix and name will be separated by an underscore.
+      // i.e. <prefix>_<dataset_name>.
+      string dataset_id_prefix = 2;
+
+      // Describes the Cloud KMS encryption key that will be used to
+      // protect destination BigQuery table. The BigQuery Service Account
+      // associated with your project requires access to this encryption key.
+      // i.e.
+      // projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{cryptoKey}.
+      // See https://cloud.google.com/bigquery/docs/customer-managed-encryption
+      // for more information.
+      string kms_key_name = 3;
+    }
+
+    // The dataset template to use for dynamic dataset creation.
+    DatasetTemplate dataset_template = 2;
+
+    // Optional. The project id of the BigQuery dataset. If not specified, the
+    // project will be inferred from the stream resource.
+    optional string project_id = 3 [(google.api.field_behavior) = OPTIONAL];
+  }
+
+  // The configuration for BLMT.
+  message BlmtConfig {
+    // Supported file formats for BigLake managed tables.
+    enum FileFormat {
+      // Default value.
+      FILE_FORMAT_UNSPECIFIED = 0;
+
+      // Parquet file format.
+      PARQUET = 1;
+    }
+
+    // Supported table formats for BigLake managed tables.
+    enum TableFormat {
+      // Default value.
+      TABLE_FORMAT_UNSPECIFIED = 0;
+
+      // Iceberg table format.
+      ICEBERG = 1;
+    }
+
+    // Required. The Cloud Storage bucket name.
+    string bucket = 1 [(google.api.field_behavior) = REQUIRED];
+
+    // The root path inside the Cloud Storage bucket.
+    string root_path = 2;
+
+    // Required. The bigquery connection.
+    // Format: `{project}.{location}.{name}`
+    string connection_name = 3 [(google.api.field_behavior) = REQUIRED];
+
+    // Required. The file format.
+    FileFormat file_format = 4 [(google.api.field_behavior) = REQUIRED];
+
+    // Required. The table format.
+    TableFormat table_format = 5 [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // AppendOnly mode defines that all changes to a table will be written to the
+  // destination table.
+  message AppendOnly {}
+
+  // Merge mode defines that all changes to a table will be merged at the
+  // destination table.
+  message Merge {}
+
+  // Target dataset(s) configuration.
+  oneof dataset_config {
+    // Single destination dataset.
+    SingleTargetDataset single_target_dataset = 201;
+
+    // Source hierarchy datasets.
+    SourceHierarchyDatasets source_hierarchy_datasets = 202;
+  }
+
+  // The guaranteed data freshness (in seconds) when querying tables created by
+  // the stream. Editing this field will only affect new tables created in the
+  // future, but existing tables will not be impacted. Lower values mean that
+  // queries will return fresher data, but may result in higher cost.
+  google.protobuf.Duration data_freshness = 300;
+
+  // Optional. Big Lake Managed Tables (BLMT) configuration.
+  BlmtConfig blmt_config = 1 [(google.api.field_behavior) = OPTIONAL];
+
+  // Destination write mode.
+  oneof write_mode {
+    // The standard mode
+    Merge merge = 301;
+
+    // Append only mode
+    AppendOnly append_only = 302;
+  }
+}
+
+// The configuration of the stream destination.
+message DestinationConfig {
+  // Required. Destination connection profile resource.
+  // Format: `projects/{project}/locations/{location}/connectionProfiles/{name}`
+  string destination_connection_profile = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "datastream.googleapis.com/ConnectionProfile"
+    }
+  ];
+
+  // Stream configuration that is specific to the data destination type.
+  oneof destination_stream_config {
+    // A configuration for how data should be loaded to Cloud Storage.
+    GcsDestinationConfig gcs_destination_config = 100;
+
+    // BigQuery destination configuration.
+    BigQueryDestinationConfig bigquery_destination_config = 101;
+  }
+}
+
+// A resource representing streaming data from a source to a destination.
+message Stream {
+  option (google.api.resource) = {
+    type: "datastream.googleapis.com/Stream"
+    pattern: "projects/{project}/locations/{location}/streams/{stream}"
+  };
+
+  // Stream state.
+  enum State {
+    // Unspecified stream state.
+    STATE_UNSPECIFIED = 0;
+
+    // The stream has been created but has not yet started streaming data.
+    NOT_STARTED = 1;
+
+    // The stream is running.
+    RUNNING = 2;
+
+    // The stream is paused.
+    PAUSED = 3;
+
+    // The stream is in maintenance mode.
+    //
+    // Updates are rejected on the resource in this state.
+    MAINTENANCE = 4;
+
+    // The stream is experiencing an error that is preventing data from being
+    // streamed.
+    FAILED = 5;
+
+    // The stream has experienced a terminal failure.
+    FAILED_PERMANENTLY = 6;
+
+    // The stream is starting, but not yet running.
+    STARTING = 7;
+
+    // The Stream is no longer reading new events, but still writing events in
+    // the buffer.
+    DRAINING = 8;
+  }
+
+  // Backfill strategy to automatically backfill the Stream's objects.
+  // Specific objects can be excluded.
+  message BackfillAllStrategy {
+    // List of objects to exclude.
+    oneof excluded_objects {
+      // Oracle data source objects to avoid backfilling.
+      OracleRdbms oracle_excluded_objects = 1;
+
+      // MySQL data source objects to avoid backfilling.
+      MysqlRdbms mysql_excluded_objects = 2;
+
+      // PostgreSQL data source objects to avoid backfilling.
+      PostgresqlRdbms postgresql_excluded_objects = 3;
+
+      // SQLServer data source objects to avoid backfilling
+      SqlServerRdbms sql_server_excluded_objects = 4;
+
+      // Salesforce data source objects to avoid backfilling
+      SalesforceOrg salesforce_excluded_objects = 5;
+
+      // MongoDB data source objects to avoid backfilling
+      MongodbCluster mongodb_excluded_objects = 6;
+
+      // Spanner data source objects to avoid backfilling.
+      SpannerDatabase spanner_excluded_objects = 7;
+
+      // Source catalog data source objects to avoid backfilling. This is mainly
+      // used to represent SaaS applications objects.
+      SourceCatalog saas_excluded_objects = 9;
+    }
+  }
+
+  // Backfill strategy to disable automatic backfill for the Stream's objects.
+  message BackfillNoneStrategy {}
+
+  // A set of rules to apply to a set of objects.
+  message RuleSet {
+    // Object filter to apply the rules to.
+    message ObjectFilter {
+      // The filter to apply.
+      oneof filter_type {
+        // Specific source object identifier.
+        SourceObjectIdentifier source_object_identifier = 1;
+      }
+    }
+
+    // A customization rule to apply to a set of objects.
+    message CustomizationRule {
+      // The rule to apply.
+      oneof rule {
+        // BigQuery partitioning rule.
+        BigQueryPartitioning bigquery_partitioning = 1;
+
+        // BigQuery clustering rule.
+        BigQueryClustering bigquery_clustering = 2;
+      }
+    }
+
+    // Required. List of customization rules to apply.
+    repeated CustomizationRule customization_rules = 1
+        [(google.api.field_behavior) = REQUIRED];
+
+    // Required. Object filter to apply the customization rules to.
+    ObjectFilter object_filter = 2 [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // Output only. Identifier. The stream's name.
+  string name = 1 [
+    (google.api.field_behavior) = IDENTIFIER,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Output only. The creation time of the stream.
+  google.protobuf.Timestamp create_time = 2
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The last update time of the stream.
+  google.protobuf.Timestamp update_time = 3
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Labels.
+  map<string, string> labels = 4;
+
+  // Required. Display name.
+  string display_name = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Source connection profile configuration.
+  SourceConfig source_config = 6 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Destination connection profile configuration.
+  DestinationConfig destination_config = 7
+      [(google.api.field_behavior) = REQUIRED];
+
+  // The state of the stream.
+  State state = 8;
+
+  // Stream backfill strategy.
+  oneof backfill_strategy {
+    // Automatically backfill objects included in the stream source
+    // configuration. Specific objects can be excluded.
+    BackfillAllStrategy backfill_all = 101;
+
+    // Do not automatically backfill any objects.
+    BackfillNoneStrategy backfill_none = 102;
+  }
+
+  // Output only. Errors on the Stream.
+  repeated Error errors = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Immutable. A reference to a KMS encryption key.
+  // If provided, it will be used to encrypt the data.
+  // If left blank, data will be encrypted using an internal Stream-specific
+  // encryption key provisioned through KMS.
+  optional string customer_managed_encryption_key = 10
+      [(google.api.field_behavior) = IMMUTABLE];
+
+  // Output only. If the stream was recovered, the time of the last recovery.
+  // Note: This field is currently experimental.
+  google.protobuf.Timestamp last_recovery_time = 13
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Reserved for future use.
+  optional bool satisfies_pzs = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Reserved for future use.
+  optional bool satisfies_pzi = 16 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Optional. Rule sets to apply to the stream.
+  repeated RuleSet rule_sets = 19 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// A specific stream object (e.g a specific DB table).
+message StreamObject {
+  option (google.api.resource) = {
+    type: "datastream.googleapis.com/StreamObject"
+    pattern: "projects/{project}/locations/{location}/streams/{stream}/objects/{object}"
+  };
+
+  // Output only. Identifier. The object resource's name.
+  string name = 1 [
+    (google.api.field_behavior) = IDENTIFIER,
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+
+  // Output only. The creation time of the object.
+  google.protobuf.Timestamp create_time = 2
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The last update time of the object.
+  google.protobuf.Timestamp update_time = 3
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Required. Display name.
+  string display_name = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Output only. Active errors on the object.
+  repeated Error errors = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The latest backfill job that was initiated for the stream object.
+  BackfillJob backfill_job = 7;
+
+  // The object identifier in the data source.
+  SourceObjectIdentifier source_object = 8;
+
+  // Output only. The customization rules for the object. These rules are
+  // derived from the parent Stream's `rule_sets` and represent the intended
+  // configuration for the object.
+  repeated Stream.RuleSet.CustomizationRule customization_rules = 9
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// Represents an identifier of an object in the data source.
+message SourceObjectIdentifier {
+  // Oracle data source object identifier.
+  message OracleObjectIdentifier {
+    // Required. The schema name.
+    string schema = 1 [(google.api.field_behavior) = REQUIRED];
+
+    // Required. The table name.
+    string table = 2 [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // PostgreSQL data source object identifier.
+  message PostgresqlObjectIdentifier {
+    // Required. The schema name.
+    string schema = 1 [(google.api.field_behavior) = REQUIRED];
+
+    // Required. The table name.
+    string table = 2 [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // Mysql data source object identifier.
+  message MysqlObjectIdentifier {
+    // Required. The database name.
+    string database = 1 [(google.api.field_behavior) = REQUIRED];
+
+    // Required. The table name.
+    string table = 2 [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // SQLServer data source object identifier.
+  message SqlServerObjectIdentifier {
+    // Required. The schema name.
+    string schema = 1 [(google.api.field_behavior) = REQUIRED];
+
+    // Required. The table name.
+    string table = 2 [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // Salesforce data source object identifier.
+  message SalesforceObjectIdentifier {
+    // Required. The object name.
+    string object_name = 1 [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // MongoDB data source object identifier.
+  message MongodbObjectIdentifier {
+    // Required. The database name.
+    string database = 1 [(google.api.field_behavior) = REQUIRED];
+
+    // Required. The collection name.
+    string collection = 2 [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // Spanner data source object identifier.
+  message SpannerObjectIdentifier {
+    // Optional. The schema name.
+    string schema = 1 [(google.api.field_behavior) = OPTIONAL];
+
+    // Required. The table name.
+    string table = 2 [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // The identifier for an object in the data source.
+  oneof source_identifier {
+    // Oracle data source object identifier.
+    OracleObjectIdentifier oracle_identifier = 1;
+
+    // Mysql data source object identifier.
+    MysqlObjectIdentifier mysql_identifier = 2;
+
+    // PostgreSQL data source object identifier.
+    PostgresqlObjectIdentifier postgresql_identifier = 3;
+
+    // SQLServer data source object identifier.
+    SqlServerObjectIdentifier sql_server_identifier = 4;
+
+    // Salesforce data source object identifier.
+    SalesforceObjectIdentifier salesforce_identifier = 5;
+
+    // MongoDB data source object identifier.
+    MongodbObjectIdentifier mongodb_identifier = 6;
+
+    // Spanner data source object identifier.
+    SpannerObjectIdentifier spanner_identifier = 7;
+  }
+}
+
+// Represents a backfill job on a specific stream object.
+message BackfillJob {
+  // State of the stream object's backfill job.
+  enum State {
+    // Default value.
+    STATE_UNSPECIFIED = 0;
+
+    // Backfill job was never started for the stream object (stream has backfill
+    // strategy defined as manual or object was explicitly excluded from
+    // automatic backfill).
+    NOT_STARTED = 1;
+
+    // Backfill job will start pending available resources.
+    PENDING = 2;
+
+    // Backfill job is running.
+    ACTIVE = 3;
+
+    // Backfill job stopped (next job run will start from beginning).
+    STOPPED = 4;
+
+    // Backfill job failed (due to an error).
+    FAILED = 5;
+
+    // Backfill completed successfully.
+    COMPLETED = 6;
+
+    // Backfill job failed since the table structure is currently unsupported
+    // for backfill.
+    UNSUPPORTED = 7;
+  }
+
+  // Triggering reason for a backfill job.
+  enum Trigger {
+    // Default value.
+    TRIGGER_UNSPECIFIED = 0;
+
+    // Object backfill job was triggered automatically according to the stream's
+    // backfill strategy.
+    AUTOMATIC = 1;
+
+    // Object backfill job was triggered manually using the dedicated API.
+    MANUAL = 2;
+  }
+
+  // Output only. Backfill job state.
+  State state = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Backfill job's triggering reason.
+  Trigger trigger = 2;
+
+  // Output only. Backfill job's start time.
+  google.protobuf.Timestamp last_start_time = 3
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Backfill job's end time.
+  google.protobuf.Timestamp last_end_time = 4
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Errors which caused the backfill job to fail.
+  repeated Error errors = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The filter for performing a partial backfill.
+  EventFilter event_filter = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// Represents a filter for included data on a stream object.
+message EventFilter {
+  // A filter type.
+  oneof filter {
+    // An SQL-query Where clause selecting which data should be included, not
+    // including the "WHERE" keyword. e.g., `t.key1 = 'value1' AND t.key2 =
+    // 'value2'`
+    string sql_where_clause = 1;
+  }
+}
+
+// Represent a user-facing Error.
+message Error {
+  // A title that explains the reason for the error.
+  string reason = 1;
+
+  // A unique identifier for this specific error,
+  // allowing it to be traced throughout the system in logs and API responses.
+  string error_uuid = 2;
+
+  // A message containing more information about the error that occurred.
+  string message = 3;
+
+  // The time when the error occurred.
+  google.protobuf.Timestamp error_time = 4;
+
+  // Additional information about the error.
+  map<string, string> details = 5;
+}
+
+// Contains the current validation results.
+message ValidationResult {
+  // A list of validations (includes both executed as well as not executed
+  // validations).
+  repeated Validation validations = 1;
+}
+
+// A validation to perform on a stream.
+message Validation {
+  // Validation execution state.
+  enum State {
+    // Unspecified state.
+    STATE_UNSPECIFIED = 0;
+
+    // Validation did not execute.
+    NOT_EXECUTED = 1;
+
+    // Validation failed.
+    FAILED = 2;
+
+    // Validation passed.
+    PASSED = 3;
+
+    // Validation executed with warnings.
+    WARNING = 4;
+  }
+
+  // A short description of the validation.
+  string description = 1;
+
+  // Output only. Validation execution status.
+  State state = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Messages reflecting the validation results.
+  repeated ValidationMessage message = 3;
+
+  // A custom code identifying this validation.
+  string code = 4;
+}
+
+// Represent user-facing validation result message.
+message ValidationMessage {
+  // Validation message level.
+  enum Level {
+    // Unspecified level.
+    LEVEL_UNSPECIFIED = 0;
+
+    // Potentially cause issues with the Stream.
+    WARNING = 1;
+
+    // Definitely cause issues with the Stream.
+    ERROR = 2;
+  }
+
+  // The result of the validation.
+  string message = 1;
+
+  // Message severity level (warning or error).
+  Level level = 2;
+
+  // Additional metadata related to the result.
+  map<string, string> metadata = 3;
+
+  // A custom code identifying this specific message.
+  string code = 4;
+}
+
+// The strategy that the stream uses for CDC replication.
+message CdcStrategy {
+  // CDC strategy to start replicating from the most recent position in the
+  // source.
+  message MostRecentStartPosition {}
+
+  // CDC strategy to resume replication from the next available position in the
+  // source.
+  message NextAvailableStartPosition {}
+
+  // CDC strategy to start replicating from a specific position in the source.
+  message SpecificStartPosition {
+    // Change Data Capture (CDC) read position.
+    oneof position {
+      // MySQL specific log position to start replicating from.
+      MysqlLogPosition mysql_log_position = 101;
+
+      // Oracle SCN to start replicating from.
+      OracleScnPosition oracle_scn_position = 102;
+
+      // SqlServer LSN to start replicating from.
+      SqlServerLsnPosition sql_server_lsn_position = 103;
+
+      // MySQL GTID set to start replicating from.
+      MysqlGtidPosition mysql_gtid_position = 104;
+
+      // MongoDB change stream position to start replicating from.
+      MongodbChangeStreamPosition mongodb_change_stream_position = 105;
+
+      // Optional. Spanner change stream position to start replicating from.
+      SpannerChangeStreamPosition spanner_change_stream_position = 106
+          [(google.api.field_behavior) = OPTIONAL];
+    }
+  }
+
+  // The position to start reading from when starting, resuming, or recovering
+  // the stream.
+  // If not set, the system's default value will be used.
+  oneof start_position {
+    // Optional. Start replicating from the most recent position in the source.
+    MostRecentStartPosition most_recent_start_position = 101
+        [(google.api.field_behavior) = OPTIONAL];
+
+    // Optional. Resume replication from the next available position in the
+    // source.
+    NextAvailableStartPosition next_available_start_position = 102
+        [(google.api.field_behavior) = OPTIONAL];
+
+    // Optional. Start replicating from a specific position in the source.
+    SpecificStartPosition specific_start_position = 103
+        [(google.api.field_behavior) = OPTIONAL];
+  }
+}
+
+// SQL Server LSN position
+message SqlServerLsnPosition {
+  // Required. Log sequence number (LSN) from where Logs will be read
+  string lsn = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Oracle SCN position
+message OracleScnPosition {
+  // Required. SCN number from where Logs will be read
+  int64 scn = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// MySQL log position
+message MysqlLogPosition {
+  // Required. The binary log file name.
+  string log_file = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. The position within the binary log file. Default is head of file.
+  optional int32 log_position = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// MySQL GTID position
+message MysqlGtidPosition {
+  // Required. The gtid set to start replication from.
+  string gtid_set = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// MongoDB change stream position
+message MongodbChangeStreamPosition {
+  // Required. The timestamp to start change stream from.
+  google.protobuf.Timestamp start_time = 1
+      [(google.api.field_behavior) = REQUIRED];
+}
+
+// Represents a position in a Spanner change stream from which to start
+// replicating.
+message SpannerChangeStreamPosition {
+  // Required. The timestamp to start change stream queries from.
+  // The timestamp must be a positive value.
+  google.protobuf.Timestamp start_time = 1
+      [(google.api.field_behavior) = REQUIRED];
+}

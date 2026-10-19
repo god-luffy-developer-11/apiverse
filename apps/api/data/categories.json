@@ -1,86 +1,166 @@
 {
-  "total_apis": 2193,
-  "total_categories": 53,
+  "total_apis": 3692,
+  "total_categories": 103,
   "categories": [
+    {
+      "name": "AI",
+      "icon": "🧠",
+      "count": 30
+    },
+    {
+      "name": "AI & Machine Learning",
+      "icon": "🧠",
+      "count": 121
+    },
     {
       "name": "APIs Covered Under APILayer Suite!",
       "icon": "✨",
       "count": 11
     },
     {
+      "name": "Advertising",
+      "icon": "📢",
+      "count": 7
+    },
+    {
+      "name": "Analytics",
+      "icon": "✨",
+      "count": 12
+    },
+    {
+      "name": "Analytics & Business",
+      "icon": "💼",
+      "count": 111
+    },
+    {
       "name": "Animals",
       "icon": "🐾",
-      "count": 24
+      "count": 29
     },
     {
       "name": "Anime",
       "icon": "⛩️",
-      "count": 20
+      "count": 26
     },
     {
       "name": "Anti-Malware",
       "icon": "🛡️",
-      "count": 17
+      "count": 23
     },
     {
       "name": "Art & Design",
       "icon": "🎨",
-      "count": 31
+      "count": 44
+    },
+    {
+      "name": "Augmented Reality",
+      "icon": "✨",
+      "count": 2
     },
     {
       "name": "Authentication & Authorization",
+      "icon": "🔐",
+      "count": 10
+    },
+    {
+      "name": "BarCode",
       "icon": "✨",
-      "count": 7
+      "count": 5
+    },
+    {
+      "name": "Big Data and Analytics",
+      "icon": "✨",
+      "count": 3
     },
     {
       "name": "Blockchain",
       "icon": "⛓️",
-      "count": 17
+      "count": 24
     },
     {
       "name": "Books",
       "icon": "📚",
-      "count": 26
+      "count": 34
     },
     {
       "name": "Business",
       "icon": "💼",
-      "count": 43
+      "count": 67
     },
     {
       "name": "Calendar",
       "icon": "📅",
-      "count": 22
+      "count": 31
+    },
+    {
+      "name": "Captcha",
+      "icon": "✨",
+      "count": 2
+    },
+    {
+      "name": "Check-In",
+      "icon": "✨",
+      "count": 3
     },
     {
       "name": "Cloud Storage & File Sharing",
       "icon": "☁️",
-      "count": 19
+      "count": 26
+    },
+    {
+      "name": "Commerce",
+      "icon": "✨",
+      "count": 7
+    },
+    {
+      "name": "Communication",
+      "icon": "✨",
+      "count": 9
+    },
+    {
+      "name": "Content",
+      "icon": "✨",
+      "count": 6
     },
     {
       "name": "Continuous Integration",
       "icon": "🔄",
-      "count": 6
+      "count": 7
     },
     {
       "name": "Cryptocurrency",
       "icon": "🪙",
-      "count": 95
+      "count": 119
+    },
+    {
+      "name": "Cryptocurrency/Crypto Wallets",
+      "icon": "🪙",
+      "count": 8
+    },
+    {
+      "name": "Currency",
+      "icon": "💱",
+      "count": 8
     },
     {
       "name": "Currency Exchange",
       "icon": "💱",
-      "count": 27
+      "count": 40
     },
     {
       "name": "Data Validation",
       "icon": "✅",
-      "count": 16
+      "count": 27
+    },
+    {
+      "name": "Databases & Storage",
+      "icon": "✨",
+      "count": 32
     },
     {
       "name": "Development",
       "icon": "💻",
-      "count": 216
+      "count": 333
     },
     {
       "name": "Dictionaries",
@@ -88,64 +168,134 @@
       "count": 15
     },
     {
+      "name": "Dictionary",
+      "icon": "✨",
+      "count": 3
+    },
+    {
+      "name": "Disasters",
+      "icon": "✨",
+      "count": 3
+    },
+    {
       "name": "Documents & Productivity",
       "icon": "📝",
-      "count": 53
+      "count": 97
+    },
+    {
+      "name": "Education",
+      "icon": "✨",
+      "count": 4
     },
     {
       "name": "Email",
       "icon": "✉️",
-      "count": 37
+      "count": 54
     },
     {
       "name": "Entertainment",
       "icon": "🍿",
-      "count": 19
+      "count": 38
     },
     {
       "name": "Environment",
       "icon": "🌱",
-      "count": 30
+      "count": 40
     },
     {
       "name": "Events",
       "icon": "🎟️",
-      "count": 4
+      "count": 6
+    },
+    {
+      "name": "Face Recognition",
+      "icon": "✨",
+      "count": 1
+    },
+    {
+      "name": "File Storage and Manipulation",
+      "icon": "✨",
+      "count": 6
     },
     {
       "name": "Finance",
       "icon": "💰",
-      "count": 96
+      "count": 169
+    },
+    {
+      "name": "Fitness",
+      "icon": "✨",
+      "count": 3
     },
     {
       "name": "Food & Drink",
       "icon": "🍔",
-      "count": 35
+      "count": 42
+    },
+    {
+      "name": "Fraud Prevention",
+      "icon": "✨",
+      "count": 1
     },
     {
       "name": "Games & Comics",
       "icon": "🎮",
-      "count": 109
+      "count": 138
     },
     {
       "name": "Geocoding",
       "icon": "🗺️",
-      "count": 111
+      "count": 196
+    },
+    {
+      "name": "Google",
+      "icon": "✨",
+      "count": 9
+    },
+    {
+      "name": "Google Cloud",
+      "icon": "☁️",
+      "count": 87
     },
     {
       "name": "Government",
       "icon": "🏛️",
-      "count": 126
+      "count": 149
     },
     {
       "name": "Health",
       "icon": "🏥",
-      "count": 47
+      "count": 52
+    },
+    {
+      "name": "Identity Verification",
+      "icon": "✨",
+      "count": 3
+    },
+    {
+      "name": "Image Moderation",
+      "icon": "✨",
+      "count": 1
+    },
+    {
+      "name": "IoT",
+      "icon": "✨",
+      "count": 8
     },
     {
       "name": "Jobs",
       "icon": "💼",
-      "count": 36
+      "count": 56
+    },
+    {
+      "name": "Legal",
+      "icon": "✨",
+      "count": 2
+    },
+    {
+      "name": "Login Authentication",
+      "icon": "🔐",
+      "count": 7
     },
     {
       "name": "MCP Servers",
@@ -155,27 +305,67 @@
     {
       "name": "Machine Learning",
       "icon": "🧠",
-      "count": 54
+      "count": 64
+    },
+    {
+      "name": "Maps",
+      "icon": "✨",
+      "count": 7
+    },
+    {
+      "name": "Miscellaneous",
+      "icon": "✨",
+      "count": 25
     },
     {
       "name": "Music",
       "icon": "🎵",
-      "count": 35
+      "count": 44
+    },
+    {
+      "name": "Music Discovery",
+      "icon": "🎵",
+      "count": 2
+    },
+    {
+      "name": "Music Identification",
+      "icon": "🎵",
+      "count": 2
+    },
+    {
+      "name": "Music Lyrics",
+      "icon": "🎵",
+      "count": 2
+    },
+    {
+      "name": "Music Stores",
+      "icon": "🎵",
+      "count": 1
+    },
+    {
+      "name": "Natural Language Processing",
+      "icon": "✨",
+      "count": 13
     },
     {
       "name": "News",
       "icon": "📰",
-      "count": 26
+      "count": 40
+    },
+    {
+      "name": "News Services",
+      "icon": "📰",
+      "count": 3
     },
     {
       "name": "Open Data",
       "icon": "🌐",
-      "count": 77
+      "count": 92
     },
     {
       "name": "Open Source Projects",
       "icon": "🐙",
-      "count": 11
+      "count": 13
     },
     {
       "name": "Patent",
@@ -185,87 +375,147 @@
     {
       "name": "Personality",
       "icon": "👤",
-      "count": 27
+      "count": 39
     },
     {
       "name": "Phone",
       "icon": "📱",
-      "count": 8
+      "count": 13
     },
     {
       "name": "Photography",
       "icon": "📷",
-      "count": 37
+      "count": 48
+    },
+    {
+      "name": "Placeholder Images",
+      "icon": "✨",
+      "count": 1
+    },
+    {
+      "name": "Places",
+      "icon": "✨",
+      "count": 6
+    },
+    {
+      "name": "Podcasts",
+      "icon": "✨",
+      "count": 6
     },
     {
       "name": "Programming",
       "icon": "⌨️",
-      "count": 5
+      "count": 11
+    },
+    {
+      "name": "Quotes",
+      "icon": "✨",
+      "count": 2
+    },
+    {
+      "name": "Resources For Design and Discovery of APIs",
+      "icon": "✨",
+      "count": 4
+    },
+    {
+      "name": "Retail",
+      "icon": "🧠",
+      "count": 1
+    },
+    {
+      "name": "Science",
+      "icon": "✨",
+      "count": 2
     },
     {
       "name": "Science & Math",
       "icon": "🔬",
-      "count": 59
+      "count": 64
     },
     {
       "name": "Security",
       "icon": "🔒",
-      "count": 60
+      "count": 79
+    },
+    {
+      "name": "Security & Identity",
+      "icon": "🔒",
+      "count": 22
     },
     {
       "name": "Shopping",
       "icon": "🛍️",
-      "count": 28
+      "count": 41
     },
     {
       "name": "Social",
       "icon": "💬",
-      "count": 58
+      "count": 85
+    },
+    {
+      "name": "Social Media",
+      "icon": "💬",
+      "count": 13
+    },
+    {
+      "name": "Source Control",
+      "icon": "✨",
+      "count": 4
+    },
+    {
+      "name": "Sport",
+      "icon": "✨",
+      "count": 7
     },
     {
       "name": "Sports & Fitness",
       "icon": "⚽",
-      "count": 66
+      "count": 92
     },
     {
       "name": "Test Data",
       "icon": "🧪",
-      "count": 37
+      "count": 50
     },
     {
       "name": "Text Analysis",
       "icon": "📊",
-      "count": 20
+      "count": 32
     },
     {
       "name": "Tracking",
       "icon": "📦",
-      "count": 11
+      "count": 13
     },
     {
       "name": "Transportation",
       "icon": "🚆",
-      "count": 94
+      "count": 116
     },
     {
       "name": "URL Shorteners",
       "icon": "🔗",
-      "count": 21
+      "count": 34
     },
     {
       "name": "Vehicle",
       "icon": "🚗",
-      "count": 15
+      "count": 20
     },
     {
       "name": "Video",
       "icon": "🎥",
-      "count": 58
+      "count": 84
+    },
+    {
+      "name": "Videogames",
+      "icon": "🎥",
+      "count": 1
     },
     {
       "name": "Weather",
       "icon": "⛅",
-      "count": 46
+      "count": 62
     }
   ]
 }
