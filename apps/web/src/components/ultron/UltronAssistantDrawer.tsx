@@ -2,8 +2,21 @@
 
 import React, { useState } from 'react';
 import { SpaceButton } from '@apiverse/ui';
-import { Atom, Send, X, Sparkles, ChevronRight, Terminal } from 'lucide-react';
+import {
+  Atom,
+  Send,
+  X,
+  Sparkles,
+  ChevronRight,
+  Terminal,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
+  Radio
+} from 'lucide-react';
 import { ModelProvider } from '@/lib/types';
+import { useUltronVoice } from '@/lib/voice/useUltronVoice';
 
 export const UltronAssistantDrawer: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,25 +25,45 @@ export const UltronAssistantDrawer: React.FC = () => {
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; text: string }>>([
     {
       role: 'assistant',
-      text: 'Hello! I am Ultron, powered by top-tier intelligence (Gemini 3.8, GPT-4o, and Claude 3.5). How can I help you today with coding, APIs, architecture, or any questions?'
+      text: 'Good day, sir. I am Ultron, operating on Google Gemini 3.8 and multi-model intelligence. I am equipped with JARVIS voice protocols and full APIVerse telemetry. How may I be of service?'
     }
   ]);
   const [isStreaming, setIsStreaming] = useState(false);
 
-  const sendMessage = async () => {
-    if (!input.trim() || isStreaming) return;
-    const userPrompt = input;
+  // JARVIS Voice Engine
+  const {
+    isListening,
+    isSpeaking,
+    voiceEnabled,
+    interimTranscript,
+    startListening,
+    stopListening,
+    speak,
+    stopSpeaking,
+    toggleVoice
+  } = useUltronVoice({
+    onCommand: (cmd) => {
+      setInput(cmd);
+      sendMessage(cmd);
+    }
+  });
+
+  const sendMessage = async (customText?: string) => {
+    const textToSend = customText || input;
+    if (!textToSend.trim() || isStreaming) return;
+
     setInput('');
-    const updatedMessages = [...messages, { role: 'user' as const, text: userPrompt }];
+    const updatedMessages = [...messages, { role: 'user' as const, text: textToSend }];
     setMessages(updatedMessages);
     setIsStreaming(true);
+    stopSpeaking();
 
     try {
       const response = await fetch('http://localhost:8000/api/v1/ultron/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: userPrompt,
+          message: textToSend,
           model,
           context_keys: ['Stripe', 'OpenAI'],
           messages_history: updatedMessages.slice(-10),
@@ -72,6 +105,11 @@ export const UltronAssistantDrawer: React.FC = () => {
           }
         }
       }
+
+      // Voice reply if voice is enabled
+      if (assistantMsg && voiceEnabled) {
+        speak(assistantMsg);
+      }
     } catch (e) {
       setMessages((prev) => [
         ...prev,
@@ -89,7 +127,7 @@ export const UltronAssistantDrawer: React.FC = () => {
         onClick={() => setIsOpen(!isOpen)}
         data-cursor="ultron"
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-white/[0.1] hover:bg-white/[0.2] border border-white/40 p-[2px] shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1.5px_1px_rgba(255,255,255,0.7)] hover:scale-105 active:scale-95 transition-all duration-300 select-none backdrop-blur-2xl"
-        title="Open Ultron AI Assistant"
+        title="Open Ultron AI Voice Assistant"
       >
         <div className="w-full h-full bg-black/60 rounded-full flex items-center justify-center relative overflow-hidden backdrop-blur-md">
           <div className="absolute inset-0 bg-white/10 animate-ping rounded-full pointer-events-none" />
@@ -97,9 +135,9 @@ export const UltronAssistantDrawer: React.FC = () => {
         </div>
       </button>
 
-      {/* Ultron Chat Drawer - Properly docked on the right side */}
+      {/* Ultron Chat Drawer */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-[400px] max-w-[calc(100vw-3rem)] h-[580px] max-h-[calc(100vh-8rem)] bg-black/40 border border-white/25 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.6),inset_0_1.5px_1px_0_rgba(255,255,255,0.7)] backdrop-blur-3xl flex flex-col overflow-hidden">
+        <div className="fixed bottom-24 right-6 z-50 w-[420px] max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-8rem)] bg-black/50 border border-white/25 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.6),inset_0_1.5px_1px_0_rgba(255,255,255,0.7)] backdrop-blur-3xl flex flex-col overflow-hidden">
           {/* Live Background Video */}
           <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
             <video
@@ -123,20 +161,37 @@ export const UltronAssistantDrawer: React.FC = () => {
                 <Atom className="w-4 h-4 text-white" />
               </div>
               <div>
-                <div className="font-display font-bold text-xs text-white tracking-wider">ULTRON SINGULARITY</div>
-                <div className="text-[10px] font-mono text-zinc-300">Glass Event Horizon • Black & White</div>
+                <div className="font-display font-bold text-xs text-white tracking-wider flex items-center gap-1.5">
+                  <span>ULTRON CORE</span>
+                  <span className="text-[9px] font-mono text-cyan-300 font-bold bg-cyan-950/60 border border-cyan-500/30 px-1.5 rounded">JARVIS VOICE</span>
+                </div>
+                <div className="text-[10px] font-mono text-zinc-300">
+                  {isSpeaking ? 'Vocalizing response...' : isListening ? 'Listening to voice cmd...' : 'Vocal & Neural Ready'}
+                </div>
               </div>
             </div>
 
-            {/* Model Selector */}
+            {/* Actions & Model Selector */}
             <div className="flex items-center gap-2">
+              <button
+                onClick={toggleVoice}
+                className={`p-1.5 rounded-xl border transition-colors ${
+                  voiceEnabled
+                    ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300'
+                    : 'bg-white/10 border-white/20 text-zinc-400'
+                }`}
+                title={voiceEnabled ? 'Voice Reply Enabled' : 'Voice Reply Muted'}
+              >
+                {voiceEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+              </button>
+
               <select
                 value={model}
                 onChange={(e) => setModel(e.target.value as ModelProvider)}
-                className="bg-black/60 backdrop-blur-md border border-white/25 rounded-xl px-2.5 py-1 text-[10px] font-mono text-white outline-none focus:border-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
+                className="bg-black/60 backdrop-blur-md border border-white/25 rounded-xl px-2 py-1 text-[10px] font-mono text-white outline-none focus:border-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
               >
-                <option value="GEMINI" className="bg-black text-white">Gemini 3.8 (Live)</option>
-                <option value="OPENAI" className="bg-black text-white">OpenAI GPT-4o</option>
+                <option value="GEMINI" className="bg-black text-white">Gemini 3.8</option>
+                <option value="OPENAI" className="bg-black text-white">GPT-4o</option>
                 <option value="ANTHROPIC" className="bg-black text-white">Claude 3.5</option>
               </select>
 
@@ -150,6 +205,19 @@ export const UltronAssistantDrawer: React.FC = () => {
             </div>
           </div>
 
+          {/* Voice Listening Banner */}
+          {isListening && (
+            <div className="px-4 py-2 bg-blue-600/30 border-b border-blue-400/40 backdrop-blur-md flex items-center justify-between text-xs font-mono text-blue-200 animate-pulse">
+              <div className="flex items-center gap-2 truncate">
+                <Radio className="w-3.5 h-3.5 text-blue-400 animate-spin shrink-0" />
+                <span className="truncate">{interimTranscript ? `"${interimTranscript}"` : 'Listening, speak your command...'}</span>
+              </div>
+              <button onClick={stopListening} className="text-[10px] text-white hover:underline shrink-0 ml-2">
+                Stop
+              </button>
+            </div>
+          )}
+
           {/* Messages Feed */}
           <div className="flex-1 p-4 overflow-y-auto space-y-3 font-sans text-xs">
             {messages.map((m, idx) => (
@@ -161,26 +229,48 @@ export const UltronAssistantDrawer: React.FC = () => {
                     : 'mr-6 bg-white/[0.04] border-white/20 text-zinc-100 shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1.5px_1px_0_rgba(255,255,255,0.3)]'
                 }`}
               >
-                <div className="text-[9px] font-mono mb-1 font-bold tracking-wider text-zinc-400">
-                  {m.role === 'user' ? 'YOU' : 'ULTRON AI'}
+                <div className="text-[9px] font-mono mb-1 font-bold tracking-wider text-zinc-400 flex items-center justify-between">
+                  <span>{m.role === 'user' ? 'YOU' : 'ULTRON AI'}</span>
+                  {m.role === 'assistant' && (
+                    <button
+                      onClick={() => (isSpeaking ? stopSpeaking() : speak(m.text))}
+                      className="text-zinc-400 hover:text-white"
+                      title="Speak Message"
+                    >
+                      <Volume2 className="w-3 h-3" />
+                    </button>
+                  )}
                 </div>
                 <div className="whitespace-pre-wrap leading-relaxed">{m.text}</div>
               </div>
             ))}
           </div>
 
-          {/* Input Bar */}
-          <div className="p-3.5 border-t border-white/20 bg-black/40 backdrop-blur-2xl flex items-center gap-2 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]">
+          {/* Input Bar with Voice Mic Button */}
+          <div className="p-3.5 border-t border-white/20 bg-black/50 backdrop-blur-2xl flex items-center gap-2 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]">
+            <button
+              onClick={isListening ? stopListening : startListening}
+              className={`w-9 h-9 rounded-full border transition-all flex items-center justify-center shrink-0 ${
+                isListening
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-[0_0_16px_rgba(37,99,235,0.8)] scale-105'
+                  : 'bg-white/10 hover:bg-white/20 text-white border-white/25 hover:border-cyan-400'
+              }`}
+              title={isListening ? 'Stop Listening' : 'Voice Command: Tap to speak'}
+            >
+              {isListening ? <Mic className="w-4 h-4 animate-bounce" /> : <Mic className="w-4 h-4" />}
+            </button>
+
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-              placeholder="Ask anything (code, debugging, concepts, writing)..."
+              placeholder={isListening ? 'Listening to speech...' : 'Type or speak command...'}
               className="flex-1 bg-white/[0.06] backdrop-blur-md border border-white/20 rounded-full px-4 py-2.5 text-xs text-white placeholder-zinc-400 outline-none focus:border-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)]"
             />
+
             <button
-              onClick={sendMessage}
+              onClick={() => sendMessage()}
               disabled={isStreaming || !input.trim()}
               className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 disabled:opacity-40 border border-white/40 text-white flex items-center justify-center transition-all shadow-[inset_0_1.5px_1px_rgba(255,255,255,0.7),0_4px_16px_rgba(0,0,0,0.4)] shrink-0"
               title="Send Message"
