@@ -2,11 +2,24 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-// Clean text for speech synthesis so female Ultron doesn't pronounce markdown symbols
+// Clean text for speech synthesis: extract a natural executive conversational summary
 export function cleanTextForSpeech(text: string): string {
   if (!text) return '';
-  let cleaned = text
-    .replace(/```[\s\S]*?```/g, ' Code synthesis provided below in console. ')
+
+  let cleaned = text;
+
+  // If text contains markdown code blocks, extract before the code block or provide a crisp vocal summary
+  if (cleaned.includes('```')) {
+    const parts = cleaned.split('```');
+    const intro = parts[0].trim();
+    if (intro.length > 20) {
+      cleaned = intro + '. The complete implementation is displayed on your console.';
+    } else {
+      cleaned = 'I have generated the requested implementation. The complete code is available on your console.';
+    }
+  }
+
+  cleaned = cleaned
     .replace(/`([^`]+)`/g, '$1')
     .replace(/\*\*([^*]+)\*\*/g, '$1')
     .replace(/\*([^*]+)\*/g, '$1')
@@ -17,13 +30,19 @@ export function cleanTextForSpeech(text: string): string {
     .replace(/https?:\/\/\S+/g, 'link')
     .replace(/\n\s*\n/g, '. ')
     .replace(/\n/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim();
 
-  // If the text is long, summarize beginning for speech so it remains crisp and articulate
-  if (cleaned.length > 380) {
-    const sentenceEnd = cleaned.indexOf('.', 280);
-    if (sentenceEnd !== -1 && sentenceEnd < 450) {
-      cleaned = cleaned.slice(0, sentenceEnd + 1) + ' I have rendered the full technical breakdown on your console, sir.';
+  // Keep vocal output to a natural conversational length (first 1-2 complete sentences, max ~260 chars)
+  if (cleaned.length > 260) {
+    const sentenceEnd = cleaned.indexOf('.', 120);
+    if (sentenceEnd !== -1 && sentenceEnd < 280) {
+      cleaned = cleaned.slice(0, sentenceEnd + 1);
+    } else {
+      const spaceIdx = cleaned.lastIndexOf(' ', 240);
+      if (spaceIdx !== -1) {
+        cleaned = cleaned.slice(0, spaceIdx) + '.';
+      }
     }
   }
 
@@ -82,7 +101,7 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
   const synthRef = useRef<SpeechSynthesis | null>(null);
   const silenceTimer = useRef<any>(null);
   const isSessionActiveRef = useRef(false);
-  const accumulatedSpeechRef = useRef('');
+  const capturedTextRef = useRef('');
   const selectedVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
 
   // Audio recording state for robust fallback
@@ -92,12 +111,12 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const isProcessingBackendTranscribe = useRef(false);
 
-  // Setup High-Quality FEMALE AI Voice (FRIDAY / Samantha / Natural English)
-  const setupFemaleVoice = useCallback(() => {
+  // Setup High-Quality Natural Voice
+  const setupVoice = useCallback(() => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
     synthRef.current = window.speechSynthesis;
 
-    const findFemaleVoice = () => {
+    const findVoice = () => {
       const voices = synthRef.current?.getVoices() || [];
       if (!voices.length) return;
 
@@ -121,31 +140,32 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
       }
     };
 
-    findFemaleVoice();
+    findVoice();
     if (synthRef.current.onvoiceschanged !== undefined) {
-      synthRef.current.onvoiceschanged = findFemaleVoice;
+      synthRef.current.onvoiceschanged = findVoice;
     }
   }, []);
 
   useEffect(() => {
-    setupFemaleVoice();
-  }, [setupFemaleVoice]);
+    setupVoice();
+  }, [setupVoice]);
 
   // Transcribe recorded audio chunks using backend Gemini Flash audio API
   const sendAudioToBackend = useCallback(async () => {
     if (isProcessingBackendTranscribe.current) return;
-    if (audioChunksRef.current.length === 0) return;
 
-    // If speech recognition already provided full captured speech, prioritize it!
-    if (accumulatedSpeechRef.current.trim().length > 3) {
-      const captured = accumulatedSpeechRef.current.trim();
+    // If speech recognition already provided captured speech, prioritize it!
+    const captured = capturedTextRef.current.trim();
+    if (captured.length > 1) {
       if (onCommand) onCommand(captured);
       return;
     }
 
+    if (audioChunksRef.current.length === 0) return;
+
     try {
       isProcessingBackendTranscribe.current = true;
-      setInterimTranscript('Processing neural voice with Gemini Flash...');
+      setInterimTranscript('Processing neural voice...');
 
       // Concatenate Float32 chunks
       let totalLength = 0;
@@ -153,8 +173,7 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
         totalLength += chunk.length;
       }
 
-      if (totalLength < 4000) {
-        // Less than 0.25 seconds of sound, probably silence
+      if (totalLength < 3000) {
         setInterimTranscript('');
         return;
       }
@@ -172,10 +191,7 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
       // Convert to base64
       const reader = new FileReader();
       const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onloadend = () => {
-          const res = reader.result as string;
-          resolve(res);
-        };
+        reader.onloadend = () => resolve(reader.result as string);
         reader.onerror = reject;
       });
       reader.readAsDataURL(wavBlob);
@@ -193,6 +209,7 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
         if (text) {
           setTranscript(text);
           setInterimTranscript('');
+          capturedTextRef.current = text;
           if (onCommand) {
             onCommand(text);
           }
@@ -241,13 +258,32 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
     }
 
     setIsListening(false);
-    sendAudioToBackend();
-    cleanupAudioHardware();
-  }, [sendAudioToBackend, cleanupAudioHardware]);
+
+    // If we have text from Web Speech API right now, invoke command immediately
+    const textNow = capturedTextRef.current.trim();
+    if (textNow.length > 1) {
+      if (onCommand) onCommand(textNow);
+      cleanupAudioHardware();
+    } else {
+      // Otherwise send audio buffer to backend Gemini transcriber
+      sendAudioToBackend().finally(() => {
+        cleanupAudioHardware();
+      });
+    }
+  }, [sendAudioToBackend, cleanupAudioHardware, onCommand]);
 
   // Start Voice Command (Speech Recognition + Parallel Audio Recording)
   const startListening = useCallback(async () => {
     if (typeof window === 'undefined') return;
+
+    // Prime speech synthesis on user interaction
+    if ('speechSynthesis' in window) {
+      try {
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+      } catch {}
+    }
 
     // Stop speaking if TTS is active
     if (synthRef.current && synthRef.current.speaking) {
@@ -258,12 +294,12 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
     setVoiceError(null);
     setTranscript('');
     setInterimTranscript('');
-    accumulatedSpeechRef.current = '';
+    capturedTextRef.current = '';
     audioChunksRef.current = [];
     isSessionActiveRef.current = true;
     setIsListening(true);
 
-    // 1. Initialize Microphone Audio Stream (100% resilient across all Chromium browsers)
+    // 1. Initialize Microphone Audio Stream (100% resilient across all browsers)
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -279,31 +315,29 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
       audioContextRef.current = actx;
 
       const source = actx.createMediaStreamSource(stream);
-      // Create ScriptProcessor to capture PCM samples
       const processor = actx.createScriptProcessor(4096, 1, 1);
       processorRef.current = processor;
 
       processor.onaudioprocess = (e) => {
         if (!isSessionActiveRef.current) return;
         const channelData = e.inputBuffer.getChannelData(0);
-        // Save copy of samples
         audioChunksRef.current.push(new Float32Array(channelData));
 
-        // Calculate real-time RMS volume level for UI visualizer
+        // Real-time audio volume level for visual pulsation
         let sum = 0;
         for (let i = 0; i < channelData.length; i += 8) {
           sum += channelData[i] * channelData[i];
         }
         const rms = Math.sqrt(sum / (channelData.length / 8));
         const normalized = Math.min(1.0, rms * 6);
-        setAudioLevel(Math.max(0.12, normalized));
+        setAudioLevel(Math.max(0.15, normalized));
       };
 
       source.connect(processor);
       processor.connect(actx.destination);
     } catch (err: any) {
       console.warn('Microphone stream access error:', err);
-      setVoiceError('Microphone permission blocked. Please allow microphone in your browser address bar.');
+      setVoiceError('Microphone permission blocked. Please allow microphone access in your browser address bar.');
       setIsListening(false);
       isSessionActiveRef.current = false;
       return;
@@ -332,8 +366,9 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
           }
 
           if (currentFinal) {
-            accumulatedSpeechRef.current += (accumulatedSpeechRef.current ? ' ' : '') + currentFinal.trim();
-            setTranscript(accumulatedSpeechRef.current);
+            const fullText = (capturedTextRef.current + ' ' + currentFinal).trim();
+            capturedTextRef.current = fullText;
+            setTranscript(fullText);
             setInterimTranscript('');
 
             clearTimeout(silenceTimer.current);
@@ -347,25 +382,22 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
             clearTimeout(silenceTimer.current);
             silenceTimer.current = setTimeout(() => {
               if (isSessionActiveRef.current) {
-                accumulatedSpeechRef.current = (accumulatedSpeechRef.current + ' ' + currentInterim).trim();
+                const fullText = (capturedTextRef.current + ' ' + currentInterim).trim();
+                capturedTextRef.current = fullText;
                 stopListening();
               }
-            }, 2200);
+            }, 2000);
           }
         };
 
         recognition.onerror = (event: any) => {
-          // If browser throws 'network' or 'no-speech', do NOT show scary error or abort!
-          // The background audio recorder captures the voice and transcribes via Gemini Flash!
-          if (event.error === 'network') {
-            console.log('Web Speech API network fallback active (audio recorder transcribes via Gemini)');
-          } else if (event.error === 'not-allowed') {
+          if (event.error === 'not-allowed') {
             setVoiceError('Microphone permission denied.');
           }
+          // On network or other benign errors, the parallel audio recorder captures the speech
         };
 
         recognition.onend = () => {
-          // If still recording audio and user is speaking, keep audio capture running
           if (isSessionActiveRef.current) {
             try {
               recognition.start();
@@ -377,11 +409,11 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
         recognition.start();
       }
     } catch (e) {
-      console.log('SpeechRecognition unavailable; relying on Gemini audio transcribe');
+      console.log('SpeechRecognition unavailable; relying on audio recorder');
     }
   }, [stopListening]);
 
-  // Speak Reply (FEMALE AI Voice)
+  // Speak Reply (Natural Voice Vocalization)
   const speak = useCallback(
     (rawText: string) => {
       if (!voiceEnabled || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
@@ -391,45 +423,53 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
       if (!clean) return;
 
       try {
-        if (!synthRef.current) {
-          synthRef.current = window.speechSynthesis;
-        }
+        const synth = window.speechSynthesis;
 
-        // Cancel existing utterance
-        synthRef.current.cancel();
+        // Chromium bug fix: resume if paused
+        if (synth.paused) {
+          synth.resume();
+        }
+        synth.cancel();
 
         const utterance = new SpeechSynthesisUtterance(clean);
         if (selectedVoiceRef.current) {
           utterance.voice = selectedVoiceRef.current;
         }
 
-        // Female AI Voice Tuning: articulate, smooth, intelligent
         utterance.pitch = 1.08;
         utterance.rate = 1.02;
         utterance.volume = 1.0;
+
+        // Prevent Chrome GC bug: keep global reference
+        (window as any).__ultronUtterance = utterance;
 
         let synthInterval: any = null;
 
         utterance.onstart = () => {
           setIsSpeaking(true);
           synthInterval = setInterval(() => {
-            setAudioLevel(0.3 + Math.random() * 0.45);
+            setAudioLevel(0.35 + Math.random() * 0.45);
           }, 80);
         };
 
-        utterance.onend = () => {
+        const handleFinish = () => {
           setIsSpeaking(false);
           clearInterval(synthInterval);
           setAudioLevel(0);
+          (window as any).__ultronUtterance = null;
         };
 
-        utterance.onerror = () => {
-          setIsSpeaking(false);
-          clearInterval(synthInterval);
-          setAudioLevel(0);
-        };
+        utterance.onend = handleFinish;
+        utterance.onerror = handleFinish;
 
-        synthRef.current.speak(utterance);
+        // Small delay to ensure cancel completes before speak
+        setTimeout(() => {
+          try {
+            synth.speak(utterance);
+          } catch (e) {
+            console.error('Failed to trigger synth.speak:', e);
+          }
+        }, 40);
       } catch (err) {
         console.error('Speech synthesis error:', err);
         setIsSpeaking(false);

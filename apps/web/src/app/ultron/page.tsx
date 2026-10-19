@@ -47,7 +47,7 @@ export default function UltronPage() {
   const [tokensCount, setTokensCount] = useState(48);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Voice Engine (Voice Command + Voice Reply like JARVIS Female AI)
+  // Voice Engine (Voice Command + Voice Reply)
   const {
     isListening,
     isSpeaking,
@@ -68,6 +68,13 @@ export default function UltronPage() {
     }
   });
 
+  // Keep live spoken text synced into input prompt
+  useEffect(() => {
+    if (isListening && (interimTranscript || transcript)) {
+      setPrompt(interimTranscript || transcript);
+    }
+  }, [isListening, interimTranscript, transcript]);
+
   // Keep Ultron state synced with voice
   useEffect(() => {
     if (isListening) {
@@ -76,6 +83,15 @@ export default function UltronPage() {
       setUltronState('idle');
     }
   }, [isListening, ultronState]);
+
+  const handleMicClick = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      setPrompt('');
+      startListening();
+    }
+  };
 
   const handleGenerate = async (customPrompt?: string) => {
     const textToRun = customPrompt || prompt;
@@ -86,6 +102,15 @@ export default function UltronPage() {
     }
     const controller = new AbortController();
     abortControllerRef.current = controller;
+
+    // Prime speech synthesis early within user interaction event
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+      } catch {}
+    }
 
     stopSpeaking();
     setUltronState('thinking');
@@ -191,20 +216,6 @@ export default function UltronPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Voice Mute/Unmute Toggle */}
-          <button
-            onClick={toggleVoice}
-            className={`p-2.5 rounded-2xl border transition-all flex items-center gap-2 text-xs font-mono backdrop-blur-xl ${
-              voiceEnabled
-                ? 'bg-cyan-500/15 border-cyan-400 text-cyan-200 shadow-[0_0_14px_rgba(6,182,212,0.3)]'
-                : 'bg-white/[0.06] border-white/20 text-zinc-400 hover:text-white'
-            }`}
-            title={voiceEnabled ? 'Female AI Voice Enabled (Click to Mute)' : 'Female AI Voice Muted (Click to Enable)'}
-          >
-            {voiceEnabled ? <Volume2 className="w-4 h-4 text-cyan-400" /> : <VolumeX className="w-4 h-4" />}
-            <span className="hidden md:inline">{voiceEnabled ? 'Female Voice: ON' : 'Voice Reply: OFF'}</span>
-          </button>
-
           <Badge variant={isSpeaking ? 'healthy' : isListening ? 'neutral' : 'crimson'} pulse>
             {isSpeaking ? 'TRANSMITTING' : isListening ? 'LISTENING' : 'CORE ONLINE'}
           </Badge>
@@ -337,15 +348,15 @@ export default function UltronPage() {
 
         {/* Voice & Text Input Command Bar */}
         <div className="flex items-center gap-2">
-          {/* Voice Command Mic Trigger (Like JARVIS) */}
+          {/* Voice Command Mic Trigger */}
           <button
-            onClick={isListening ? stopListening : startListening}
+            onClick={handleMicClick}
             className={`p-3.5 rounded-full border transition-all duration-300 flex items-center justify-center relative shrink-0 ${
               isListening
                 ? 'bg-blue-600 text-white border-blue-400 shadow-[0_0_24px_rgba(37,99,235,0.8)] scale-105 animate-pulse'
                 : 'bg-white/10 hover:bg-white/20 text-white border-white/25 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)]'
             }`}
-            title={isListening ? 'Stop Listening' : 'Voice Command: Tap to speak to Ultron'}
+            title={isListening ? 'Stop & Submit Voice Command' : 'Voice Command: Tap to speak to Ultron'}
           >
             {isListening ? <Mic className="w-4 h-4 animate-bounce" /> : <Mic className="w-4 h-4 text-white" />}
             {isListening && (
