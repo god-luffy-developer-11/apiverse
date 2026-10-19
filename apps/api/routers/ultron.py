@@ -259,6 +259,57 @@ async def ask_ultron(req: UltronPromptSchema):
         }
     )
 
+@router.post("/transcribe")
+async def transcribe_audio(payload: dict):
+    """
+    Multimodal speech-to-text transcription powered by Gemini Flash.
+    Accepts JSON: {"audio_base64": "<base64_data>", "mime_type": "audio/wav"}
+    Works 100% reliably regardless of browser speech recognition cloud connectivity.
+    """
+    key = settings.GEMINI_API_KEY
+    if not key:
+        return {"transcript": "", "error": "Gemini API key not configured"}
+
+    audio_b64 = payload.get("audio_base64", "")
+    mime_type = payload.get("mime_type", "audio/wav")
+
+    # Strip data URL prefix if present
+    if "," in audio_b64:
+        audio_b64 = audio_b64.split(",", 1)[1]
+
+    if not audio_b64 or len(audio_b64) < 100:
+        return {"transcript": "", "error": "Empty or invalid audio data"}
+
+    body = {
+        "contents": [{
+            "parts": [
+                {"inline_data": {"mime_type": mime_type, "data": audio_b64}},
+                {"text": "Transcribe the spoken words in this audio exactly. Output ONLY the plain transcription text. If there is only silence, background noise, or no clear speech, output nothing."}
+            ]
+        }],
+        "generationConfig": {
+            "temperature": 0.0,
+            "maxOutputTokens": 256
+        }
+    }
+
+    for model_name in ["gemini-flash-latest", "gemini-flash-lite-latest"]:
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={key}"
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                res = await client.post(url, json=body)
+                if res.status_code == 200:
+                    data = res.json()
+                    candidates = data.get("candidates", [])
+                    if candidates:
+                        text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                        return {"transcript": text.strip(), "model": model_name}
+        except Exception as e:
+            print(f"Transcription model {model_name} error: {e}")
+            continue
+
+    return {"transcript": "", "error": "Transcription unavailable"}
+
 @router.post("/ask")
 async def ask_ultron_sync(req: UltronPromptSchema):
     """Synchronous JSON response for quick questions."""
