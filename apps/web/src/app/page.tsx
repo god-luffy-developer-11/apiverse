@@ -29,22 +29,14 @@ export default function LandingPage() {
         <span className="text-zinc-300">MINERALISTIC 2026</span>
       </div>
 
-      {/* Hero Title: Stark Pure White & High Contrast Luminous Visibility */}
-      <div className="relative text-center max-w-5xl px-4 z-10">
-        {/* Subtle luminous atmospheric backlight so text is always crystal clear on any wallpaper */}
-        <div className="absolute inset-0 -z-10 bg-black/40 backdrop-blur-[3px] rounded-3xl blur-2xl pointer-events-none" />
+      {/* Hero Title: Crisp Pure White */}
+      <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-black text-center tracking-tight max-w-5xl leading-[1.1] text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
+        The Developer Operating System for Working with APIs
+      </h1>
 
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-black tracking-tight leading-[1.1] text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
-          The Developer Operating System for{' '}
-          <span className="text-white drop-shadow-[0_0_28px_rgba(255,255,255,0.7)] underline decoration-white/40 decoration-wavy underline-offset-8">
-            Working with APIs
-          </span>
-        </h1>
-
-        <p className="mt-5 text-base sm:text-lg text-white font-sans font-medium text-center max-w-2xl mx-auto leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-          Experience your APIs as a living universe. Watch keys orbit as celestial planets, stream live telemetry, and command <span className="text-white font-bold underline decoration-white decoration-2">Ultron</span>—the fractured singularity core.
-        </p>
-      </div>
+      <p className="mt-5 text-base sm:text-lg text-zinc-300 text-center max-w-2xl font-sans font-light leading-relaxed">
+        Experience your APIs as a living universe. Watch keys orbit as celestial planets, stream live telemetry, and command <span className="text-white font-semibold underline decoration-red-500 decoration-2">Ultron</span>—the fractured singularity core.
+      </p>
 
       {/* Action Buttons: Liquid Glass Pill Controls */}
       <div className="mt-8 flex items-center gap-4 flex-wrap justify-center z-10">
