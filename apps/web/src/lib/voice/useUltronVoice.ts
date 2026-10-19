@@ -111,7 +111,7 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const isProcessingBackendTranscribe = useRef(false);
 
-  // Setup High-Quality Natural Voice
+  // Setup High-Quality Voice (Prioritize 100% LOCAL OS voices so they never fail on network)
   const setupVoice = useCallback(() => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
     synthRef.current = window.speechSynthesis;
@@ -120,18 +120,14 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
       const voices = synthRef.current?.getVoices() || [];
       if (!voices.length) return;
 
+      // Priority list: First look for reliable LOCAL voices (Microsoft Zira, David, Samantha, etc.)
       const preferred = [
-        voices.find((v) => v.name.includes('Google UK English Female')),
-        voices.find((v) => v.name.includes('Google US English') && !v.name.toLowerCase().includes('male')),
+        voices.find((v) => v.localService && (v.name.includes('Zira') || v.name.includes('Jenny') || v.name.includes('Aria'))),
         voices.find((v) => v.name.includes('Zira')),
-        voices.find((v) => v.name.includes('Jenny')),
-        voices.find((v) => v.name.includes('Aria')),
-        voices.find((v) => v.name.includes('Sonia')),
-        voices.find((v) => v.name.toLowerCase().includes('female')),
-        voices.find((v) => v.name.toLowerCase().includes('samantha')),
-        voices.find((v) => v.name.toLowerCase().includes('victoria')),
-        voices.find((v) => v.name.toLowerCase().includes('karen')),
-        voices.find((v) => v.lang === 'en-GB'),
+        voices.find((v) => v.localService && v.name.toLowerCase().includes('samantha')),
+        voices.find((v) => v.name.includes('Google UK English Female')),
+        voices.find((v) => v.localService && v.lang.startsWith('en')),
+        voices.find((v) => v.lang === 'en-US'),
         voices.find((v) => v.lang.startsWith('en'))
       ].filter(Boolean);
 
@@ -276,12 +272,13 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
   const startListening = useCallback(async () => {
     if (typeof window === 'undefined') return;
 
-    // Prime speech synthesis on user interaction
+    // Prime speech synthesis on user interaction so subsequent voice replies are never blocked
     if ('speechSynthesis' in window) {
       try {
-        if (window.speechSynthesis.paused) {
-          window.speechSynthesis.resume();
-        }
+        window.speechSynthesis.resume();
+        const primer = new SpeechSynthesisUtterance(' ');
+        primer.volume = 0.01;
+        window.speechSynthesis.speak(primer);
       } catch {}
     }
 
@@ -394,7 +391,6 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
           if (event.error === 'not-allowed') {
             setVoiceError('Microphone permission denied.');
           }
-          // On network or other benign errors, the parallel audio recorder captures the speech
         };
 
         recognition.onend = () => {
@@ -413,11 +409,11 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
     }
   }, [stopListening]);
 
-  // Speak Reply (Natural Voice Vocalization)
+  // Speak Reply (Robust, Zero-Fail Voice Synthesis)
   const speak = useCallback(
     (rawText: string) => {
       if (!voiceEnabled || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-      if (!rawText) return;
+      if (!rawText || !rawText.trim()) return;
 
       const clean = cleanTextForSpeech(rawText);
       if (!clean) return;
@@ -425,22 +421,38 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
       try {
         const synth = window.speechSynthesis;
 
-        // Chromium bug fix: resume if paused
+        // 1. Resume synth if paused
         if (synth.paused) {
           synth.resume();
         }
-        synth.cancel();
 
-        const utterance = new SpeechSynthesisUtterance(clean);
-        if (selectedVoiceRef.current) {
-          utterance.voice = selectedVoiceRef.current;
+        // 2. Only cancel if actively speaking previous utterance
+        if (synth.speaking) {
+          synth.cancel();
         }
 
-        utterance.pitch = 1.08;
-        utterance.rate = 1.02;
+        const utterance = new SpeechSynthesisUtterance(clean);
+        utterance.lang = 'en-US';
         utterance.volume = 1.0;
+        utterance.rate = 1.02;
+        utterance.pitch = 1.06;
 
-        // Prevent Chrome GC bug: keep global reference
+        // 3. Select local voice if available
+        if (selectedVoiceRef.current) {
+          utterance.voice = selectedVoiceRef.current;
+        } else {
+          const voices = synth.getVoices();
+          if (voices && voices.length > 0) {
+            const match =
+              voices.find((v) => v.localService && (v.name.includes('Zira') || v.name.includes('Jenny') || v.name.includes('Aria'))) ||
+              voices.find((v) => v.name.includes('Zira')) ||
+              voices.find((v) => v.localService && v.lang.startsWith('en')) ||
+              voices.find((v) => v.lang.startsWith('en'));
+            if (match) utterance.voice = match;
+          }
+        }
+
+        // 4. Retain window reference to prevent garbage collection mid-speech
         (window as any).__ultronUtterance = utterance;
 
         let synthInterval: any = null;
@@ -460,16 +472,33 @@ export function useUltronVoice({ onCommand, autoSpeak = true }: UseUltronVoiceOp
         };
 
         utterance.onend = handleFinish;
-        utterance.onerror = handleFinish;
 
-        // Small delay to ensure cancel completes before speak
-        setTimeout(() => {
-          try {
-            synth.speak(utterance);
-          } catch (e) {
-            console.error('Failed to trigger synth.speak:', e);
+        utterance.onerror = (e) => {
+          console.warn('Utterance error:', e);
+          handleFinish();
+          // Fallback: If voice failed because of a specific voice object, retry once with system default voice
+          if (utterance.voice) {
+            try {
+              const fallback = new SpeechSynthesisUtterance(clean);
+              fallback.lang = 'en-US';
+              fallback.volume = 1.0;
+              (window as any).__ultronUtterance = fallback;
+              synth.speak(fallback);
+            } catch {}
           }
-        }, 40);
+        };
+
+        // 5. Speak!
+        synth.speak(utterance);
+
+        // Keep-alive timer for Chrome speech synthesis
+        const keepAlive = setInterval(() => {
+          if (!synth.speaking) {
+            clearInterval(keepAlive);
+          } else if (synth.paused) {
+            synth.resume();
+          }
+        }, 3000);
       } catch (err) {
         console.error('Speech synthesis error:', err);
         setIsSpeaking(false);
