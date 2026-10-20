@@ -194,3 +194,106 @@ html, body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* ==========================================================================
+   DYNAMIC SOLAR LIGHT THEME (Activated via Header LiquidGlassSwitch)
+   ========================================================================== */
+html.light,
+html.light body {
+  background-color: #f8fafc !important;
+  background-image:
+    radial-gradient(1px 1px at 30px 40px, #cbd5e1 100%, transparent),
+    radial-gradient(1.5px 1.5px at 150px 90px, #94a3b8 100%, transparent),
+    radial-gradient(1px 1px at 280px 220px, #cbd5e1 100%, transparent),
+    radial-gradient(1px 1px at 360px 450px, #e2e8f0 100%, transparent),
+    radial-gradient(1.8px 1.8px at 500px 300px, #94a3b8 100%, transparent) !important;
+  color: #0f172a !important;
+}
+
+html.light header {
+  background-color: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.9) !important;
+  color: #0f172a !important;
+}
+
+html.light aside {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.06) !important;
+}
+
+html.light .glass-panel {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #0f172a !important;
+  box-shadow:
+    0 14px 35px -8px rgba(0, 0, 0, 0.08),
+    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1.5px 0 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light .glass-panel:hover {
+  border-color: rgba(0, 0, 0, 0.22) !important;
+  box-shadow: 0 18px 45px -6px rgba(0, 0, 0, 0.12) !important;
+}
+
+html.light h1,
+html.light h2,
+html.light h3,
+html.light h4,
+html.light .text-white {
+  color: #0f172a !important;
+}
+
+html.light .text-zinc-100,
+html.light .text-zinc-200,
+html.light .text-zinc-300 {
+  color: #334155 !important;
+}
+
+html.light .text-zinc-400,
+html.light .text-zinc-500 {
+  color: #64748b !important;
+}
+
+html.light input,
+html.light textarea,
+html.light select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.light pre,
+html.light code {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light .bg-black,
+html.light .bg-black\/90,
+html.light .bg-black\/80,
+html.light .bg-black\/70,
+html.light .bg-black\/60,
+html.light .bg-black\/40 {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #0f172a !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html.light video.live-wallpaper-video {
+  opacity: 0.25 !important;
+  filter: brightness(1.15) contrast(0.9) !important;
+}
+
+html, body, .glass-panel, header, aside {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}

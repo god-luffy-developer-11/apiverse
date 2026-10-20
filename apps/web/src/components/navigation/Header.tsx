@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { realtimeGateway } from '@/lib/realtime-client';
 import { Orbit, Radio, Zap, Shield, Search, Moon, Sun, PanelLeft } from 'lucide-react';
 import { LiquidGlassSwitch } from '@/components/ui/LiquidGlassSwitch';
+import { useTheme } from '@/context/ThemeContext';
 
 export const Header: React.FC<{
   onOpenWarp: () => void;
@@ -15,8 +16,8 @@ export const Header: React.FC<{
   onToggleSidebar,
   sidebarCollapsed = false
 }) => {
+  const { theme, toggleTheme, isDark } = useTheme();
   const [realtimeStatus, setRealtimeStatus] = useState<'LIVE' | 'RECONNECTING' | 'OFFLINE'>('LIVE');
-  const [deepSpaceMode, setDeepSpaceMode] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isNearTop, setIsNearTop] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
@@ -107,12 +108,13 @@ export const Header: React.FC<{
 
         {/* Right: Windows 11 Action Center Tray */}
         <div className="flex items-center gap-3 relative z-10">
-          <div className="hidden lg:block">
+          {/* Theme Switcher Button */}
+          <div className="hidden lg:block" title={isDark ? "Switch to Solar Light Theme" : "Switch to Cosmic Dark Theme"}>
             <LiquidGlassSwitch
-              checked={deepSpaceMode}
-              onChange={setDeepSpaceMode}
-              leftIcon={<Orbit className="w-3 h-3 text-white" />}
-              rightIcon={<Moon className="w-3 h-3 text-white" />}
+              checked={!isDark}
+              onChange={toggleTheme}
+              leftIcon={<Moon className="w-3.5 h-3.5 text-slate-900" />}
+              rightIcon={<Sun className="w-3.5 h-3.5 text-amber-500" />}
             />
           </div>
 
