@@ -23,26 +23,31 @@ import {
   Volume2,
   VolumeX,
   Radio,
-  AudioWaveform
+  AudioWaveform,
+  ExternalLink
 } from 'lucide-react';
 import { ModelProvider, UltronState } from '@/lib/types';
 import { useUltronVoice } from '@/lib/voice/useUltronVoice';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const QUICK_PROMPTS = [
-  'Debug 429 rate limit failure on Twilio staging planet',
-  'Synthesize high-speed Stripe webhook validator with replay protection',
-  'Architect multi-model RAG pipeline using Google Gemini & Supabase pgvector',
-  'Run cryptographic audit on all AES-256-GCM vault secret prefixes'
+  'Create an API key for Stripe and secure in vault',
+  'Test API https://httpbin.org/get',
+  'Open Planetary Key Vault',
+  'Rotate active vault keys',
+  'Check system status and telemetry'
 ];
 
 export default function UltronPage() {
+  const router = useRouter();
   const [model, setModel] = useState<ModelProvider>('GEMINI');
   const [ultronState, setUltronState] = useState<UltronState>('idle');
   const [prompt, setPrompt] = useState(QUICK_PROMPTS[0]);
   const [output, setOutput] = useState(
-    'Ultron Singularity Core initialized. Quantum event horizon stabilized at 60fps.\nJARVIS voice protocol ready for multi-model architectural synthesis, payload diagnostics, and real-time verbal commands.'
+    'Ultron Singularity Core initialized. Quantum event horizon stabilized at 60fps.\nFull autonomous control over APIverse is active. You can command me via voice or text to create API keys, secure secrets in the vault, test live endpoints, and navigate pages.'
   );
+  const [executedAction, setExecutedAction] = useState<any | null>(null);
   const [copied, setCopied] = useState(false);
   const [tokensCount, setTokensCount] = useState(48);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -141,6 +146,7 @@ export default function UltronPage() {
       const decoder = new TextDecoder();
       let accumulated = '';
       let tokens = 0;
+      let voiceSummaryToSpeak = '';
 
       while (true) {
         const { value, done } = await reader.read();
@@ -154,6 +160,17 @@ export default function UltronPage() {
             let token = '';
             try {
               const parsed = JSON.parse(raw);
+              if (parsed.action) {
+                setExecutedAction(parsed.action);
+                if (parsed.action.type === 'NAVIGATE' && parsed.action.path) {
+                  setTimeout(() => {
+                    router.push(parsed.action.path);
+                  }, 1200);
+                }
+              }
+              if (parsed.voice_summary) {
+                voiceSummaryToSpeak = parsed.voice_summary;
+              }
               token = parsed.text || parsed.token || '';
             } catch {
               token = raw;
@@ -169,8 +186,10 @@ export default function UltronPage() {
       }
       setUltronState('idle');
 
-      // JARVIS Voice Reply
-      if (accumulated && voiceEnabled) {
+      // Vocalize response
+      if (voiceSummaryToSpeak) {
+        speak(voiceSummaryToSpeak);
+      } else if (accumulated && voiceEnabled) {
         speak(accumulated);
       }
     } catch (e: any) {
@@ -298,6 +317,36 @@ export default function UltronPage() {
             </select>
           </div>
         </div>
+
+        {/* Autonomous Action Execution Badge */}
+        {executedAction && (
+          <div className="p-3.5 rounded-2xl bg-cyan-500/10 border border-cyan-400/40 backdrop-blur-xl flex items-center justify-between gap-4 animate-in fade-in duration-300 shadow-[0_0_20px_rgba(6,182,212,0.25)]">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-300">
+                <Zap className="w-4 h-4 animate-pulse" />
+              </div>
+              <div>
+                <div className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+                  Autonomous Action Executed
+                </div>
+                <div className="text-xs font-mono font-bold text-white">
+                  {executedAction.title || executedAction.type}
+                </div>
+              </div>
+            </div>
+
+            {executedAction.link && (
+              <Link
+                href={executedAction.link}
+                className="px-3 py-1.5 rounded-xl bg-cyan-500 text-black font-mono text-xs font-bold hover:bg-cyan-400 transition-all flex items-center gap-1.5 shadow-sm shrink-0"
+              >
+                <span>View Module</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </Link>
+            )}
+          </div>
+        )}
 
         {/* Streamed Output Window */}
         <div className="relative">

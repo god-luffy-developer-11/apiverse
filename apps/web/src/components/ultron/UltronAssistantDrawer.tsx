@@ -17,8 +17,10 @@ import {
 } from 'lucide-react';
 import { ModelProvider } from '@/lib/types';
 import { useUltronVoice } from '@/lib/voice/useUltronVoice';
+import { useRouter } from 'next/navigation';
 
 export const UltronAssistantDrawer: React.FC = () => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [model, setModel] = useState<ModelProvider>('GEMINI');
   const [input, setInput] = useState('');
@@ -76,6 +78,7 @@ export const UltronAssistantDrawer: React.FC = () => {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let assistantMsg = '';
+      let voiceSummaryToSpeak = '';
 
       setMessages((prev) => [...prev, { role: 'assistant', text: '' }]);
 
@@ -91,6 +94,15 @@ export const UltronAssistantDrawer: React.FC = () => {
             let token = '';
             try {
               const parsed = JSON.parse(raw);
+              if (parsed.action && parsed.action.type === 'NAVIGATE' && parsed.action.path) {
+                setTimeout(() => {
+                  router.push(parsed.action.path);
+                  setIsOpen(false);
+                }, 1200);
+              }
+              if (parsed.voice_summary) {
+                voiceSummaryToSpeak = parsed.voice_summary;
+              }
               token = parsed.text || parsed.token || '';
             } catch {
               token = raw;
@@ -107,8 +119,10 @@ export const UltronAssistantDrawer: React.FC = () => {
         }
       }
 
-      // Voice reply if voice is enabled
-      if (assistantMsg && voiceEnabled) {
+      // Voice reply
+      if (voiceSummaryToSpeak) {
+        speak(voiceSummaryToSpeak);
+      } else if (assistantMsg && voiceEnabled) {
         speak(assistantMsg);
       }
     } catch (e) {
